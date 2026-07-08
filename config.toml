@@ -11,7 +11,7 @@ pygmentsUseClasses = true
 
 [params]
   description = "Air1，个人博客。不定期更新。"
-  copyright = "© 2026 Air1"
+  copyright = "Part of Air1 Quick Tools · Powered by Cloudflare"
   dark = "auto"
   highlight = true
   siteAuthor = "Air1"
