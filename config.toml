@@ -1,6 +1,6 @@
 baseURL = "https://haenlau.github.io/HugoPost/"
 title = "HugoPost"
-locale = "en-US"
+languageCode = "en-US"
 enableInlineShortcodes = true
 pygmentsCodeFences = true
 pygmentsUseClasses = true
