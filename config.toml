@@ -1,4 +1,4 @@
-baseURL = "/"
+baseURL = "https://blog.air1.cn/"
 title = "Air1"
 theme = "air1"
 languageCode = "zh-CN"
