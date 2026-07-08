@@ -1,7 +1,7 @@
 [posts]
 
 [posts.title]
-other = "文章"
+other = "post"
 
 [posts.date]
 other = "2006年1月2日"

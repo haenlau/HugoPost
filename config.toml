@@ -17,15 +17,15 @@ pygmentsUseClasses = true
 [menu]
   [[menu.main]]
     identifier = "posts"
-    name = "文章"
-    title = "文章"
+    name = "post"
+    title = "post"
     url = "/"
     weight = 10
 
   [[menu.main]]
     identifier = "about"
-    name = "关于"
-    title = "关于"
+    name = "about"
+    title = "about"
     url = "/about/"
     weight = 20
 
