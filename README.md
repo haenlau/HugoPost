@@ -1,47 +1,44 @@
 # HugoPost
 
-HugoPost is a lightweight, responsive theme for [Hugo](https://gohugo.io), designed for clean personal publishing and fast static-site deployment.
+HugoPost is a minimal Hugo site using the Etch-style theme layout. It is ready to deploy on Cloudflare Pages as a static site.
 
-![screenshot](images/screenshot_small.png)
-
-## Features
-
-* Homepage with a list of posts.
-* Support for standalone pages.
-* Responsive layout for mobile and desktop.
-* Syntax highlighting with customizable styles.
-* Dark theme that follows the user's system preference.
-* No external JavaScript dependencies, no web fonts.
-* Internationalization friendly.
-
-## Installation
-
-Add the theme to your Hugo site's `themes` folder:
-
-```bash
-git submodule add https://github.com/haenlau/HugoPost.git themes/HugoPost
-```
-
-Run the site with the theme enabled:
-
-```bash
-hugo server -t HugoPost
-```
-
-## EdgeOne Pages
-
-For Tencent Cloud EdgeOne Pages, use:
+## Structure
 
 ```text
+config.toml
+content/
+themes/etch/
+```
+
+The site lives at the repository root. The theme lives in `themes/etch`.
+
+## Cloudflare Pages
+
+Use these settings:
+
+```text
+Framework preset: Hugo
 Build command: hugo --gc --minify
-Output directory: public
+Build output directory: public
+Root directory: /
 ```
 
-This repository can be deployed directly as a Hugo static site. The sample theme configuration is also available in `exampleSite/`.
-
-If you only want to build the sample site, use:
+Recommended environment variable:
 
 ```text
-Build command: hugo --source exampleSite --themesDir .. --theme HugoPost --destination public --gc --minify
-Output directory: exampleSite/public
+HUGO_VERSION = 0.147.7
+```
+
+The site uses relative URLs, so it works on a `*.pages.dev` domain or a custom domain without changing `baseURL`.
+
+## Local Development
+
+```bash
+hugo server
+```
+
+Build locally:
+
+```bash
+hugo --gc --minify
 ```

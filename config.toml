@@ -1,6 +1,8 @@
-baseURL = "https://haenlau.github.io/HugoPost/"
+baseURL = "/"
 title = "HugoPost"
+theme = "etch"
 languageCode = "en-US"
+relativeURLs = true
 enableInlineShortcodes = true
 pygmentsCodeFences = true
 pygmentsUseClasses = true
