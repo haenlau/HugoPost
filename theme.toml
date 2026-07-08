@@ -1,0 +1,13 @@
+name = "HugoPost"
+license = "MIT"
+licenselink = "https://github.com/haenlau/HugoPost/blob/master/LICENSE"
+description = "Lightweight Hugo theme for personal publishing"
+homepage = "https://github.com/haenlau/HugoPost"
+demosite = "https://haenlau.github.io/HugoPost/"
+tags = ["simple", "minimal", "clean", "fast", "blog", "responsive", "dark mode", "privacy"]
+features = ["fast", "blog", "syntax highlighting", "dark mode"]
+min_version = "0.41"
+
+[author]
+  name = "haenlau"
+  homepage = "https://github.com/haenlau"
