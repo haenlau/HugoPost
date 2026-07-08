@@ -112,7 +112,7 @@ main#content ul#posts {
     list-style-type: none;
     font-size: 16px;
     font-size: 1.6rem;
-    margin-top: 8px;
+    margin-top: 10px;
     padding: 0;
 }
 
@@ -170,6 +170,15 @@ main#content header#post-header > div {
     display: block;
     font-size: 0.85em;
     color: #767676;
+}
+
+main#content nav.post-footer-nav {
+    margin-top: 32px;
+}
+
+main#content nav.post-footer-nav a {
+    color: #767676;
+    font-size: 0.92em;
 }
 
 main#content #toc {

@@ -13,5 +13,10 @@
         </div>
     </header>
     {{- .Content -}}
+    {{- if eq .Section "posts" }}
+    <nav class="post-footer-nav" aria-label="post navigation">
+        <a href="{{ "/" | relLangURL }}">&larr; post</a>
+    </nav>
+    {{- end }}
 </article>
 {{ end }}
