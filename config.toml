@@ -32,6 +32,9 @@ pygmentsUseClasses = true
 [permalinks]
   posts = "/:title/"
 
+[pagination]
+  pagerSize = 5
+
 [markup.goldmark.renderer]
   unsafe = true
 

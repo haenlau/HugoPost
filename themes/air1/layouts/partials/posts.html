@@ -1,6 +1,29 @@
 <h3>{{ i18n "posts.title" }}</h3>
 <ul id="posts">
-{{- range where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- $pages := where site.RegularPages "Section" "posts" -}}
+{{- $paginator := .Paginate $pages -}}
+{{- range $paginator.Pages }}
     {{ .Render "li" }}
 {{- end }}
 </ul>
+{{- if gt $paginator.TotalPages 1 }}
+<nav class="pagination" aria-label="post pagination">
+    {{- with $paginator.Prev }}
+    <a href="{{ .URL }}">prev</a>
+    {{- else }}
+    <span>prev</span>
+    {{- end }}
+    {{- range $paginator.Pagers }}
+    {{- if eq . $paginator }}
+    <strong>{{ .PageNumber }}</strong>
+    {{- else }}
+    <a href="{{ .URL }}">{{ .PageNumber }}</a>
+    {{- end }}
+    {{- end }}
+    {{- with $paginator.Next }}
+    <a href="{{ .URL }}">next</a>
+    {{- else }}
+    <span>next</span>
+    {{- end }}
+</nav>
+{{- end }}
