@@ -1,8 +1,10 @@
 +++
-title = "About"
+title = "关于 Air1"
 date = "2026-07-08"
 +++
 
-HugoPost is a personal publishing site maintained by haenlau.
+Air1 是一个中文个人发布站。
 
-It is built with Hugo and designed for fast static deployment.
+它不追求复杂的功能，也不把注意力交给动效和装饰。它更像一张干净的桌面：打开、写下、发布，然后把位置留给内容。
+
+这个站点使用 Hugo 构建，可以部署在 Cloudflare Pages 这类静态托管平台上。

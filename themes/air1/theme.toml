@@ -1,0 +1,13 @@
+name = "Air1"
+license = "MIT"
+licenselink = "https://github.com/haenlau/Air1/blob/main/LICENSE"
+description = "A minimal Chinese publishing theme for Air1"
+homepage = "https://github.com/haenlau/Air1"
+demosite = "https://air1.pages.dev/"
+tags = ["simple", "minimal", "clean", "fast", "blog", "responsive", "dark mode", "privacy"]
+features = ["fast", "blog", "syntax highlighting", "dark mode"]
+min_version = "0.41"
+
+[author]
+  name = "Air1"
+  homepage = "https://github.com/haenlau"

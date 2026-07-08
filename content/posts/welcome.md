@@ -1,14 +1,18 @@
 +++
 author = "haenlau"
-title = "Welcome to HugoPost"
+title = "Air1，先从这里开始"
+slug = "air1-start"
+url = "/air1-start/"
 date = "2026-07-08"
-description = "A first post for HugoPost."
+description = "Air1 的第一篇记录。"
 tags = [
-  "hugo",
-  "blog",
+  "Air1",
+  "记录",
 ]
 +++
 
-Welcome to HugoPost.
+Air1 从一个很小的目标开始：把发布这件事变得轻一点。
 
-This site is built with Hugo and can be deployed as a static site on Tencent Cloud EdgeOne Pages.
+不需要复杂后台，不需要花哨界面，也不需要每次写东西都像在启动一个项目。打开仓库，写一篇 Markdown，推送，然后让静态站点完成剩下的事。
+
+这里会放一些文章、技术笔记和日常观察。形式尽量简单，内容慢慢长出来。

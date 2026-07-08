@@ -1,5 +1,7 @@
 +++
-title = "HugoPost"
+title = "Air1"
 +++
 
-Personal notes, essays, and updates by haenlau.
+一个轻量、安静、专注表达的中文发布空间。
+
+这里用来放文章、想法、记录和那些还没有被归类的片段。页面保持简单，是为了让内容自己站稳。
