@@ -405,8 +405,8 @@ main#content .code-block pre {
 
 main#content .code-copy-button {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 15px;
+    right: 12px;
     z-index: 1;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 6px;
