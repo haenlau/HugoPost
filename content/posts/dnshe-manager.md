@@ -1,7 +1,7 @@
 +++
 title = "DNSHE 域名自动续期平台"
-date = "2026-07-09"
-lastmod = "2026-07-09"
+date = "2026-03-22"
+lastmod = "2026-03-22"
 description = "记录 DNSHE 免费域名自动续期管理平台的设计思路、Cloudflare Workers 部署方式、核心模块与常见踩坑。"
 url = "/dnshe-manager/"
 aliases = ["/posts/dnshe-manager/"]
@@ -422,65 +422,7 @@ Invoke-RestMethod -Uri "https://your-domain/api/check" -Method POST -Headers @{ 
 
 ---
 
-## 13. 关键踩坑
-
-### 13.1 不要把 Worker 自定义域名路由强写进配置
-
-原始笔记里特别提到了这一点。
-
-有些情况下，如果 API 令牌没有足够的 Zone 权限，`wrangler.toml` 里的 `routes` 会失败。更稳的方式是到 Dashboard 里手动绑定域名。
-
-### 13.2 DNSHE 的 GET 参数要拼到 URL
-
-这类接口不是把 GET 参数塞进 body 就能工作，必须显式拼到 query string。
-
-```javascript
-let url = `${baseUrl}&endpoint=${endpoint}&action=${action}`;
-if (method === "GET" && data) {
-  const params = new URLSearchParams(data);
-  url += "&" + params.toString();
-}
-```
-
-### 13.3 API 令牌权限不够时，有些动作要回 Dashboard
-
-例如：
-
-- 缺少 DNS 记录编辑权限
-- 缺少更高范围的 Zone 权限
-
-这种时候不要一直怀疑代码，有时是权限边界的问题。
-
-### 13.4 中文 Secret 可能踩编码问题
-
-在 PowerShell 下通过管道设置带中文的 Secret，可能出现编码异常。保守做法是：
-
-- Secret 名称用英文
-- 关键配置值尽量避免在命令行里直接塞中文
-
-### 13.5 后台 UI 不一定要上前端框架
-
-原始笔记提到通过 CDN 动态加载 React / MUI 在某些环境里兼容性一般。对这种 Worker 小后台来说，纯 HTML / CSS 往往更稳、更省心。
-
----
-
-## 14. 适合继续优化的方向
-
-如果这个项目后续继续做，可以考虑：
-
-| 方向 | 说明 |
-|------|------|
-| 增加更多域名平台支持 | 不只支持 DNSHE |
-| 增加域名健康监控 | DNS 解析、证书到期、可访问性 |
-| 扩展通知渠道 | Discord、Slack、Webhook |
-| 域名分组 | 按项目、用途、环境区分 |
-| 操作日志 | 完整记录后台操作与续期行为 |
-
-如果只是自己长期维护几个 DNSHE 域名，那么现在这版其实已经足够实用；如果要做成更通用的平台，上面这些方向才值得继续投入。
-
----
-
-## 15. 总结
+## 13. 总结
 
 `DNSHE-Manager` 这类项目的价值，不在于技术栈多复杂，而在于它把一个容易忘、但后果明显的维护动作自动化了。
 
