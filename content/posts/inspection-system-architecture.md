@@ -5,31 +5,58 @@ lastmod = "2026-06-23"
 description = "基于 FastAPI + Vue3 的每日值班巡检系统，支持 20 个巡检点数据采集、图片压缩、Word 报告生成及 SMB 共享归档。"
 url = "/inspection-system-architecture/"
 aliases = ["/posts/inspection-system-architecture/"]
+categories = ["运维"]
 draft = false
 +++
-<h2 id="系统概述">系统概述</h2>
+## 系统概述
 
-<p>为生产机房值班监控开发的 B/S 架构巡检系统。核心流程：前端采集 20 个巡检点数据 → 图片压缩 → 生成 Word 报告 → 上传 SMB 共享目录归档。</p>
+为生产机房值班监控开发的 B/S 架构巡检系统。核心流程：前端采集 20 个巡检点数据 → 图片压缩 → 生成 Word 报告 → 上传 SMB 共享目录归档。
 
-<p>技术栈：</p>
+技术栈：
 
-<table><thead><tr><th>组件</th><th>技术</th></tr></thead><tbody><tr><td>后端</td><td>Python FastAPI</td></tr><tr><td>前端</td><td>Vue 3 + Element Plus</td></tr><tr><td>数据库</td><td>SQLite</td></tr><tr><td>图片处理</td><td>Pillow</td></tr><tr><td>文档生成</td><td>python-docx</td></tr><tr><td>远程传输</td><td>smbprotocol</td></tr><tr><td>部署</td><td>Nginx + Systemd</td></tr></tbody></table>
+| 组件 | 技术 |
+|------|------|
+| 后端 | Python FastAPI |
+| 前端 | Vue 3 + Element Plus |
+| 数据库 | SQLite |
+| 图片处理 | Pillow |
+| 文档生成 | python-docx |
+| 远程传输 | smbprotocol |
+| 部署 | Nginx + Systemd |
 
-<h2 id="服务器配置">服务器配置</h2>
+## 服务器配置
 
-<table><thead><tr><th>项目</th><th>值</th></tr></thead><tbody><tr><td>IP 地址</td><td><code>YOUR_SERVER_IP</code></td></tr><tr><td>操作系统</td><td>Ubuntu 26.04 LTS</td></tr><tr><td>Python</td><td>3.14.4</td></tr><tr><td>Node.js</td><td>22.23.0</td></tr><tr><td>内存</td><td>7.2 GB</td></tr><tr><td>磁盘</td><td>62 GB</td></tr><tr><td>CPU</td><td>4 核</td></tr></tbody></table>
+| 项目 | 值 |
+|------|-----|
+| IP 地址 | `YOUR_SERVER_IP` |
+| 操作系统 | Ubuntu 26.04 LTS |
+| Python | 3.14.4 |
+| Node.js | 22.23.0 |
+| 内存 | 7.2 GB |
+| 磁盘 | 62 GB |
+| CPU | 4 核 |
 
-<p>访问入口：</p>
+访问入口：
 
-<table><thead><tr><th>服务</th><th>地址</th></tr></thead><tbody><tr><td>前端页面</td><td><code>http://YOUR_SERVER_IP</code></td></tr><tr><td>API 文档</td><td><code>http://YOUR_SERVER_IP/api/docs</code></td></tr><tr><td>健康检查</td><td><code>http://YOUR_SERVER_IP/api/health</code></td></tr></tbody></table>
+| 服务 | 地址 |
+|------|------|
+| 前端页面 | `http://YOUR_SERVER_IP` |
+| API 文档 | `http://YOUR_SERVER_IP/api/docs` |
+| 健康检查 | `http://YOUR_SERVER_IP/api/health` |
 
-<p>SMB 共享配置：</p>
+SMB 共享配置：
 
-<table><thead><tr><th>项目</th><th>值</th></tr></thead><tbody><tr><td>服务器</td><td><code>YOUR_SMB_SERVER</code></td></tr><tr><td>共享名</td><td><code>YOUR_SHARE_NAME</code></td></tr><tr><td>用户名</td><td><code>YOUR_DOMAIN\YOUR_USER</code></td></tr><tr><td>密码</td><td><code>YOUR_PASSWORD</code></td></tr></tbody></table>
+| 项目 | 值 |
+|------|-----|
+| 服务器 | `YOUR_SMB_SERVER` |
+| 共享名 | `YOUR_SHARE_NAME` |
+| 用户名 | `YOUR_DOMAIN\YOUR_USER` |
+| 密码 | `YOUR_PASSWORD` |
 
-<h2 id="目录结构">目录结构</h2>
+## 目录结构
 
-<pre><code class="language-text">/opt/inspection/
+```text
+/opt/inspection/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py              # FastAPI 入口
@@ -60,27 +87,66 @@ draft = false
 │   ├── dist/        # 构建产物
 │   ├── package.json
 │   └── vite.config.js
-└── deploy.sh</code></pre>
+└── deploy.sh
+```
 
-<h2 id="巡检点清单20-个">巡检点清单（20 个）</h2>
+## 巡检点清单（20 个）
 
-<table><thead><tr><th>序号</th><th>巡检点名称</th><th>类型</th><th>基线范围</th></tr></thead><tbody><tr><td>1</td><td>办公机房环境</td><td>温度+湿度</td><td>温度 18-27℃ / 湿度 35%-60%</td></tr><tr><td>2</td><td>办公机房消防</td><td>状态</td><td>无故障灯告警</td></tr><tr><td>3</td><td>Prometheus</td><td>状态</td><td>运行正常 / 各设备在线</td></tr><tr><td>4</td><td>Zabbix</td><td>状态+流量</td><td>运行正常 / 各设备流量正常</td></tr><tr><td>5</td><td>主动威胁欺骗防御系统（谛听）</td><td>状态+数值</td><td>无新增事件</td></tr><tr><td>6</td><td>云工作负载保护平台（牧云）</td><td>状态</td><td>无外部或明显恶意行为</td></tr><tr><td>7</td><td>官网华为防火墙（6630E）</td><td>状态</td><td>流量统计 10 Mbps-60 Mbps</td></tr><tr><td>8</td><td>长亭 WEB 应用防火墙（雷池）</td><td>状态+数值</td><td>无外部或明显恶意行为</td></tr><tr><td>9</td><td>绿盟 WEB 应用防火墙（WAF）</td><td>状态</td><td>无外部或明显恶意行为</td></tr><tr><td>10</td><td>北单外网 TLS 防火墙（6625F）</td><td>数值</td><td>CT 和 CNC 均 0.8 Mbps 左右</td></tr><tr><td>11</td><td>北单 K8S 负载均衡连接数</td><td>数值</td><td>-</td></tr><tr><td>12</td><td>北单 TiDB 负载均衡连接数</td><td>数值</td><td>-</td></tr><tr><td>13</td><td>威胁监测与分析系统（天眼）</td><td>状态</td><td>无外部或外访恶意行为</td></tr><tr><td>14</td><td>综合监控大屏</td><td>状态×3</td><td>各模块运行正常</td></tr><tr><td>15</td><td>NTP 服务器</td><td>状态</td><td>卫星数量正常，时间无偏移</td></tr><tr><td>16</td><td>生产机房环境</td><td>温度+湿度</td><td>温度 18-27℃ / 湿度 35%-60%</td></tr><tr><td>17</td><td>计通监控平台</td><td>状态</td><td>无新增事件</td></tr><tr><td>18</td><td>电池室环境</td><td>状态</td><td>无渗漏无异常</td></tr><tr><td>19</td><td>柴油发电机</td><td>状态</td><td>候命中，无漏油</td></tr><tr><td>20</td><td>生产机房消防</td><td>状态</td><td>无故障灯告警</td></tr></tbody></table>
+| 序号 | 巡检点名称 | 类型 | 基线范围 |
+|------|-----------|------|----------|
+| 1 | 办公机房环境 | 温度+湿度 | 温度 18-27℃ / 湿度 35%-60% |
+| 2 | 办公机房消防 | 状态 | 无故障灯告警 |
+| 3 | Prometheus | 状态 | 运行正常 / 各设备在线 |
+| 4 | Zabbix | 状态+流量 | 运行正常 / 各设备流量正常 |
+| 5 | 主动威胁欺骗防御系统（谛听） | 状态+数值 | 无新增事件 |
+| 6 | 云工作负载保护平台（牧云） | 状态 | 无外部或明显恶意行为 |
+| 7 | 官网华为防火墙（6630E） | 状态 | 流量统计 10 Mbps-60 Mbps |
+| 8 | 长亭 WEB 应用防火墙（雷池） | 状态+数值 | 无外部或明显恶意行为 |
+| 9 | 绿盟 WEB 应用防火墙（WAF） | 状态 | 无外部或明显恶意行为 |
+| 10 | 北单外网 TLS 防火墙（6625F） | 数值 | CT 和 CNC 均 0.8 Mbps 左右 |
+| 11 | 北单 K8S 负载均衡连接数 | 数值 | - |
+| 12 | 北单 TiDB 负载均衡连接数 | 数值 | - |
+| 13 | 威胁监测与分析系统（天眼） | 状态 | 无外部或外访恶意行为 |
+| 14 | 综合监控大屏 | 状态×3 | 各模块运行正常 |
+| 15 | NTP 服务器 | 状态 | 卫星数量正常，时间无偏移 |
+| 16 | 生产机房环境 | 温度+湿度 | 温度 18-27℃ / 湿度 35%-60% |
+| 17 | 计通监控平台 | 状态 | 无新增事件 |
+| 18 | 电池室环境 | 状态 | 无渗漏无异常 |
+| 19 | 柴油发电机 | 状态 | 候命中，无漏油 |
+| 20 | 生产机房消防 | 状态 | 无故障灯告警 |
 
-<p>字段类型说明：</p>
+字段类型说明：
 
-<table><thead><tr><th>类型</th><th>说明</th><th>前端组件</th></tr></thead><tbody><tr><td><code>status</code></td><td>正常/异常单选</td><td>Radio.Group</td></tr><tr><td><code>numeric</code></td><td>必填数值</td><td>InputNumber</td></tr><tr><td><code>numeric_optional</code></td><td>选填数值</td><td>InputNumber</td></tr></tbody></table>
+| 类型 | 说明 | 前端组件 |
+|------|------|----------|
+| `status` | 正常/异常单选 | Radio.Group |
+| `numeric` | 必填数值 | InputNumber |
+| `numeric_optional` | 选填数值 | InputNumber |
 
-<p>条件高亮规则：</p>
+条件高亮规则：
 
-<table><thead><tr><th>条件</th><th>效果</th></tr></thead><tbody><tr><td>状态异常</td><td>整行红底</td></tr><tr><td>温湿度异常（超出基线）</td><td>整行黄底</td></tr><tr><td>CNC 数量 &gt; 0</td><td>数值红字 + 二次确认弹窗</td></tr></tbody></table>
+| 条件 | 效果 |
+|------|------|
+| 状态异常 | 整行红底 |
+| 温湿度异常（超出基线） | 整行黄底 |
+| CNC 数量 > 0 | 数值红字 + 二次确认弹窗 |
 
-<h2 id="api-接口">API 接口</h2>
+## API 接口
 
-<table><thead><tr><th>方法</th><th>路径</th><th>说明</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/health</code></td><td>健康检查</td></tr><tr><td>GET</td><td><code>/api/shift-info</code></td><td>获取班次信息</td></tr><tr><td>GET</td><td><code>/api/smb-paths</code></td><td>获取 SMB 路径选项</td></tr><tr><td>POST</td><td><code>/api/upload-image</code></td><td>上传图片</td></tr><tr><td>POST</td><td><code>/api/inspection/submit</code></td><td>提交巡检记录</td></tr><tr><td>GET</td><td><code>/api/report/{record_id}</code></td><td>下载报告</td></tr><tr><td>GET</td><td><code>/api/inspection/records</code></td><td>获取巡检记录列表</td></tr></tbody></table>
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/health` | 健康检查 |
+| GET | `/api/shift-info` | 获取班次信息 |
+| GET | `/api/smb-paths` | 获取 SMB 路径选项 |
+| POST | `/api/upload-image` | 上传图片 |
+| POST | `/api/inspection/submit` | 提交巡检记录 |
+| GET | `/api/report/{record_id}` | 下载报告 |
+| GET | `/api/inspection/records` | 获取巡检记录列表 |
 
-<h3 id="提交巡检请求体示例">提交巡检请求体示例</h3>
+### 提交巡检请求体示例
 
-<pre><code class="language-json">{
+```json
+{
   "record_date": "2026-06-23",
   "shift": "morning",
   "inspector_name": "YOUR_NAME",
@@ -96,19 +162,32 @@ draft = false
   },
   "smb_path": "\\\\YOUR_SMB_SERVER\\YOUR_SHARE_NAME\\YOUR_NAME",
   "skip_smb": false
-}</code></pre>
+}
+```
 
-<p>参数说明：</p>
+参数说明：
 
-<table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td><code>smb_path</code></td><td>支持完整 UNC 路径或相对路径</td></tr><tr><td><code>skip_smb</code></td><td>为 <code>true</code> 时只生成报告，不上传 SMB</td></tr></tbody></table>
+| 参数 | 说明 |
+|------|------|
+| `smb_path` | 支持完整 UNC 路径或相对路径 |
+| `skip_smb` | 为 `true` 时只生成报告，不上传 SMB |
 
-<h2 id="服务管理">服务管理</h2>
+## 服务管理
 
-<table><thead><tr><th>操作类别</th><th>命令</th><th>说明</th></tr></thead><tbody><tr><td>状态检查</td><td><code>systemctl status inspection</code></td><td>检查后端服务状态</td></tr><tr><td></td><td><code>systemctl status nginx</code></td><td>检查 Nginx 状态</td></tr><tr><td></td><td><code>systemctl is-enabled inspection</code></td><td>检查是否开机自启</td></tr><tr><td>启停操作</td><td><code>systemctl restart/stop/start inspection</code></td><td>重启/停止/启动后端</td></tr><tr><td>查看日志</td><td><code>journalctl -u inspection -f</code></td><td>实时跟踪后端日志</td></tr><tr><td></td><td><code>journalctl -u inspection -n 100</code></td><td>查看最近 100 行</td></tr><tr><td></td><td><code>tail -f /var/log/nginx/access.log</code></td><td>实时跟踪 Nginx 日志</td></tr></tbody></table>
+| 操作类别 | 命令 | 说明 |
+|----------|------|------|
+| 状态检查 | `systemctl status inspection` | 检查后端服务状态 |
+| | `systemctl status nginx` | 检查 Nginx 状态 |
+| | `systemctl is-enabled inspection` | 检查是否开机自启 |
+| 启停操作 | `systemctl restart/stop/start inspection` | 重启/停止/启动后端 |
+| 查看日志 | `journalctl -u inspection -f` | 实时跟踪后端日志 |
+| | `journalctl -u inspection -n 100` | 查看最近 100 行 |
+| | `tail -f /var/log/nginx/access.log` | 实时跟踪 Nginx 日志 |
 
-<h3 id="systemd-服务配置">Systemd 服务配置</h3>
+### Systemd 服务配置
 
-<pre><code class="language-ini">[Unit]
+```ini
+[Unit]
 Description=Inspection System Backend
 After=network.target
 
@@ -121,50 +200,67 @@ Restart=always
 RestartSec=5
 
 [Install]
-WantedBy=multi-user.target</code></pre>
+WantedBy=multi-user.target
+```
 
-<h2 id="数据备份与恢复">数据备份与恢复</h2>
+## 数据备份与恢复
 
-<table><thead><tr><th>操作</th><th>命令</th></tr></thead><tbody><tr><td>备份数据库</td><td><code>cp /opt/inspection/backend/data/inspection.db /opt/inspection/backend/data/inspection_\$(date +%Y%m%d).db</code></td></tr><tr><td>备份报告</td><td><code>tar -czf /tmp/reports_\$(date +%Y%m%d).tar.gz /opt/inspection/backend/reports/</code></td></tr><tr><td>恢复数据库</td><td><code>systemctl stop inspection &amp;&amp; cp /opt/inspection/backend/data/inspection.db.bak /opt/inspection/backend/data/inspection.db &amp;&amp; systemctl start inspection</code></td></tr></tbody></table>
+| 操作 | 命令 |
+|------|------|
+| 备份数据库 | `cp /opt/inspection/backend/data/inspection.db /opt/inspection/backend/data/inspection_\$(date +%Y%m%d).db` |
+| 备份报告 | `tar -czf /tmp/reports_\$(date +%Y%m%d).tar.gz /opt/inspection/backend/reports/` |
+| 恢复数据库 | `systemctl stop inspection && cp /opt/inspection/backend/data/inspection.db.bak /opt/inspection/backend/data/inspection.db && systemctl start inspection` |
 
-<h2 id="常见问题排查">常见问题排查</h2>
+## 常见问题排查
 
-<p><strong>服务无法启动：</strong></p>
+**服务无法启动：**
 
-<pre><code class="language-bash">journalctl -u inspection -n 50     # 查看详细错误
+```bash
+journalctl -u inspection -n 50     # 查看详细错误
 lsof -i :8000                      # 检查端口占用
 # 手动启动测试（前台运行，观察报错）
-cd /opt/inspection/backend &amp;&amp; python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000</code></pre>
+cd /opt/inspection/backend && python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
 
-<p><strong>SMB 上传失败：</strong></p>
+**SMB 上传失败：**
 
-<pre><code class="language-bash">python3 -c "
+```bash
+python3 -c "
 import smbclient
 smbclient.register_session('YOUR_SMB_SERVER', username='YOUR_DOMAIN\\\\YOUR_USER', password='YOUR_PASSWORD')
 print('SMB 连接成功')
 "
-journalctl -u inspection | grep -i smb</code></pre>
+journalctl -u inspection | grep -i smb
+```
 
-<p><strong>图片上传失败：</strong></p>
+**图片上传失败：**
 
-<pre><code class="language-bash">ls -la /opt/inspection/backend/tmp/   # 检查权限
+```bash
+ls -la /opt/inspection/backend/tmp/   # 检查权限
 rm -rf /opt/inspection/backend/tmp/*  # 清理临时文件
-df -h /                               # 检查磁盘空间</code></pre>
+df -h /                               # 检查磁盘空间
+```
 
-<p><strong>前端无法访问：</strong></p>
+**前端无法访问：**
 
-<pre><code class="language-bash">nginx -t                              # 检查 Nginx 配置
+```bash
+nginx -t                              # 检查 Nginx 配置
 ls -la /opt/inspection/frontend/dist/ # 检查构建产物
 # 重新构建前端
-cd /opt/inspection/frontend &amp;&amp; npm run build</code></pre>
+cd /opt/inspection/frontend && npm run build
+```
 
-<h2 id="部署流程">部署流程</h2>
+## 部署流程
 
-<table><thead><tr><th>部署类型</th><th>操作</th></tr></thead><tbody><tr><td>后端更新</td><td><code>scp -r ./backend/* root@YOUR_SERVER_IP:/opt/inspection/backend/ &amp;&amp; ssh root@YOUR_SERVER_IP "systemctl restart inspection"</code></td></tr><tr><td>前端更新</td><td><code>scp -r ./frontend/* root@YOUR_SERVER_IP:/opt/inspection/frontend/ &amp;&amp; ssh root@YOUR_SERVER_IP "cd /opt/inspection/frontend &amp;&amp; npm run build"</code></td></tr></tbody></table>
+| 部署类型 | 操作 |
+|----------|------|
+| 后端更新 | `scp -r ./backend/* root@YOUR_SERVER_IP:/opt/inspection/backend/ && ssh root@YOUR_SERVER_IP "systemctl restart inspection"` |
+| 前端更新 | `scp -r ./frontend/* root@YOUR_SERVER_IP:/opt/inspection/frontend/ && ssh root@YOUR_SERVER_IP "cd /opt/inspection/frontend && npm run build"` |
 
-<h3 id="一键部署脚本">一键部署脚本</h3>
+### 一键部署脚本
 
-<pre><code class="language-bash">#!/bin/bash
+```bash
+#!/bin/bash
 SERVER="YOUR_SERVER_IP"
 USER="root"
 
@@ -175,7 +271,7 @@ echo "=== 2. 上传前端代码 ==="
 scp -r ./frontend/* $USER@$SERVER:/opt/inspection/frontend/
 
 echo "=== 3. 构建前端 ==="
-ssh $USER@$SERVER "cd /opt/inspection/frontend &amp;&amp; npm run build"
+ssh $USER@$SERVER "cd /opt/inspection/frontend && npm run build"
 
 echo "=== 4. 重启服务 ==="
 ssh $USER@$SERVER "systemctl restart inspection"
@@ -183,25 +279,49 @@ ssh $USER@$SERVER "systemctl restart inspection"
 echo "=== 5. 检查状态 ==="
 ssh $USER@$SERVER "systemctl status inspection --no-pager | head -5"
 
-echo "=== 部署完成 ==="</code></pre>
+echo "=== 部署完成 ==="
+```
 
-<h2 id="巡检点配置修改">巡检点配置修改</h2>
+## 巡检点配置修改
 
-<p>添加新巡检点需要同步修改三个文件：</p>
+添加新巡检点需要同步修改三个文件：
 
-<table><thead><tr><th>序号</th><th>文件</th><th>说明</th></tr></thead><tbody><tr><td>1</td><td><code>backend/app/schemas.py</code></td><td>Pydantic 模型 + <code>POINT_DEFINITIONS</code></td></tr><tr><td>2</td><td><code>backend/app/models.py</code></td><td>SQLAlchemy 数据库模型</td></tr><tr><td>3</td><td><code>frontend/src/utils/definitions.js</code></td><td>前端定义</td></tr></tbody></table>
+| 序号 | 文件 | 说明 |
+|------|------|------|
+| 1 | `backend/app/schemas.py` | Pydantic 模型 + `POINT_DEFINITIONS` |
+| 2 | `backend/app/models.py` | SQLAlchemy 数据库模型 |
+| 3 | `frontend/src/utils/definitions.js` | 前端定义 |
 
-<p>修改后需要删除旧数据库并重启服务：</p>
+修改后需要删除旧数据库并重启服务：
 
-<pre><code class="language-bash">rm /opt/inspection/backend/data/inspection.db
-systemctl restart inspection</code></pre>
+```bash
+rm /opt/inspection/backend/data/inspection.db
+systemctl restart inspection
+```
 
-<p>修改基线范围或字段名称：只需改 <code>schemas.py</code> 和 <code>definitions.js</code> 中对应字段的 <code>standard</code> 或 <code>label</code> 值。</p>
+修改基线范围或字段名称：只需改 `schemas.py` 和 `definitions.js` 中对应字段的 `standard` 或 `label` 值。
 
-<h2 id="python-依赖">Python 依赖</h2>
+## Python 依赖
 
-<table><thead><tr><th>依赖</th><th>版本</th><th>用途</th></tr></thead><tbody><tr><td>fastapi</td><td>0.118.0</td><td>Web 框架</td></tr><tr><td>uvicorn</td><td>latest</td><td>ASGI 服务器</td></tr><tr><td>sqlalchemy</td><td>2.0.45</td><td>ORM 数据库操作</td></tr><tr><td>python-multipart</td><td>latest</td><td>文件上传解析</td></tr><tr><td>python-docx</td><td>1.2.0</td><td>Word 报告生成</td></tr><tr><td>Pillow</td><td>12.1.1</td><td>图片压缩处理</td></tr><tr><td>smbprotocol</td><td>1.16.1</td><td>SMB 共享上传</td></tr><tr><td>pydantic</td><td>2.12.5</td><td>数据校验</td></tr><tr><td>pydantic-settings</td><td>latest</td><td>配置管理</td></tr><tr><td>apscheduler</td><td>latest</td><td>定时任务</td></tr></tbody></table>
+| 依赖 | 版本 | 用途 |
+|------|------|------|
+| fastapi | 0.118.0 | Web 框架 |
+| uvicorn | latest | ASGI 服务器 |
+| sqlalchemy | 2.0.45 | ORM 数据库操作 |
+| python-multipart | latest | 文件上传解析 |
+| python-docx | 1.2.0 | Word 报告生成 |
+| Pillow | 12.1.1 | 图片压缩处理 |
+| smbprotocol | 1.16.1 | SMB 共享上传 |
+| pydantic | 2.12.5 | 数据校验 |
+| pydantic-settings | latest | 配置管理 |
+| apscheduler | latest | 定时任务
 
-<h2 id="前端依赖">前端依赖</h2>
+## 前端依赖
 
-<table><thead><tr><th>依赖</th><th>版本</th></tr></thead><tbody><tr><td>Vue</td><td>3.5+</td></tr><tr><td>Element Plus</td><td>2.8+</td></tr><tr><td>Axios</td><td>1.7+</td></tr><tr><td>vuedraggable</td><td>4.1+</td></tr><tr><td>SortableJS</td><td>1.15+</td></tr></tbody></table>
+| 依赖 | 版本 |
+|------|------|
+| Vue | 3.5+ |
+| Element Plus | 2.8+ |
+| Axios | 1.7+ |
+| vuedraggable | 4.1+ |
+| SortableJS | 1.15+ |

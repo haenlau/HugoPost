@@ -228,6 +228,45 @@ main#content #toc ol li:before {
     counter-increment: item;
 }
 
+main#content table {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 0.96em;
+}
+
+main#content thead {
+    background: #f4f5f6;
+}
+
+main#content th,
+main#content td {
+    border: 1px solid #d8d8d8;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+
+main#content th {
+    color: #313a3d;
+    font-weight: 600;
+}
+
+main#content details {
+    margin: 18px 0;
+    padding: 10px 14px;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+main#content summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
 main#content img {
     max-width: 100%;
     margin: 0 auto;
@@ -292,10 +331,55 @@ main#content pre {
     margin: 20px 0;
     padding: 1.5rem 1.5rem;
     line-height: 1.4;
+    border-radius: 8px;
+    background: #1f2328;
+    color: #f5f7fa;
 }
 
 main#content pre code {
     padding: 0;
+}
+
+main#content .code-block {
+    position: relative;
+    margin: 20px 0;
+}
+
+main#content .code-block pre,
+main#content .code-block .highlight {
+    margin: 0;
+}
+
+main#content .code-block .highlight {
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+main#content .code-block .highlight pre {
+    background: transparent;
+    border-radius: 0;
+}
+
+main#content .code-copy {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 0;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.78em;
+    line-height: 1;
+    color: #f5f7fa;
+    background: rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+}
+
+main#content .code-copy:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+main#content .code-copy.is-copied {
+    background: rgba(85, 183, 114, 0.32);
 }
 
 main#content .footnotes {

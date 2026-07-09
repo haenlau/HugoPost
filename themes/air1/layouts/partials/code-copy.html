@@ -1,0 +1,70 @@
+<script>
+(() => {
+    function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        textarea.style.pointerEvents = "none";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        return Promise.resolve();
+    }
+
+    function enhanceCodeBlocks() {
+        const pres = document.querySelectorAll("main#content pre");
+        pres.forEach((pre) => {
+            const target = pre.parentElement && pre.parentElement.classList.contains("highlight")
+                ? pre.parentElement
+                : pre;
+
+            if (target.parentElement && target.parentElement.classList.contains("code-block")) {
+                return;
+            }
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "code-block";
+            target.parentNode.insertBefore(wrapper, target);
+            wrapper.appendChild(target);
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "code-copy";
+            button.setAttribute("aria-label", "Copy code");
+            button.textContent = "copy";
+
+            button.addEventListener("click", async () => {
+                try {
+                    await copyText(pre.innerText.replace(/\n$/, ""));
+                    button.textContent = "copied";
+                    button.classList.add("is-copied");
+                    window.setTimeout(() => {
+                        button.textContent = "copy";
+                        button.classList.remove("is-copied");
+                    }, 1500);
+                } catch (error) {
+                    button.textContent = "failed";
+                    window.setTimeout(() => {
+                        button.textContent = "copy";
+                    }, 1500);
+                }
+            });
+
+            wrapper.appendChild(button);
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", enhanceCodeBlocks);
+    } else {
+        enhanceCodeBlocks();
+    }
+})();
+</script>

@@ -41,8 +41,12 @@ main#content ul#posts small {
     color: #a7a7a7;
 }
 
+main#content ul#posts li a {
+    color: #ebebeb;
+}
+
 main#content ul#posts li a:hover {
-    color: #21c7ff;
+    color: #ebebeb;
 }
 
 main#content header#post-header div {
@@ -51,6 +55,42 @@ main#content header#post-header div {
 
 main#content nav.post-footer-nav a {
     color: #a7a7a7;
+}
+
+main#content thead {
+    background: #1f1f1f;
+}
+
+main#content th,
+main#content td {
+    border-color: #4a4a4a;
+}
+
+main#content th {
+    color: #ebebeb;
+}
+
+main#content details {
+    border-color: #4a4a4a;
+    background: #171717;
+}
+
+main#content pre {
+    background: #0f1115;
+    color: #f5f7fa;
+}
+
+main#content .code-copy {
+    color: #f5f7fa;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+main#content .code-copy:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+main#content .code-copy.is-copied {
+    background: rgba(85, 183, 114, 0.38);
 }
 {{- if not (eq .Site.Params.dark "on") -}}
 }

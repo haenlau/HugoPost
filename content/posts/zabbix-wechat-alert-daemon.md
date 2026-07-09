@@ -5,43 +5,63 @@ lastmod = "2026-04-15"
 description = "基于 Python 的 Zabbix 告警推送守护进程，适配网闸同步场景，轮询 Zabbix 数据库 alerts 表，通过企业微信 API 实时推送告警到手机。"
 url = "/zabbix-wechat-alert-daemon/"
 aliases = ["/posts/zabbix-wechat-alert-daemon/"]
+categories = ["笔记"]
 draft = false
 +++
-<h2 id="背景">背景</h2>
+## 背景
 
-<p>生产环境的 Zabbix 服务器处于内网隔离区，无法直接访问互联网，也就无法通过企业微信 API 推送告警。</p>
+生产环境的 Zabbix 服务器处于内网隔离区，无法直接访问互联网，也就无法通过企业微信 API 推送告警。
 
-<p>解决方案：利用网闸将 Zabbix 数据库单向同步到一台可联网的中转服务器，告警推送脚本部署在中转服务器上，只读同步库的 <code>alerts</code> 表，通过企业微信 API 将告警推送到手机。</p>
+解决方案：利用网闸将 Zabbix 数据库单向同步到一台可联网的中转服务器，告警推送脚本部署在中转服务器上，只读同步库的 `alerts` 表，通过企业微信 API 将告警推送到手机。
 
-<h2 id="一服务概述">一、服务概述</h2>
+## 一、服务概述
 
-<table><thead><tr><th>项目</th><th>内容</th></tr></thead><tbody><tr><td><strong>服务器</strong></td><td><code>192.168.23.22</code></td></tr><tr><td><strong>操作系统</strong></td><td>Ubuntu Server，内核 6.8.0-85-generic</td></tr><tr><td><strong>服务名</strong></td><td><code>wechat-alert.service</code> (systemd 守护进程)</td></tr><tr><td><strong>脚本路径</strong></td><td><code>/opt/alert/wechat.py</code></td></tr><tr><td><strong>Python 环境</strong></td><td><code>/opt/alert/venv/</code></td></tr><tr><td><strong>运行用户</strong></td><td><code>root</code></td></tr><tr><td><strong>重启策略</strong></td><td><code>Restart=always</code>，失败后 10 秒自动拉起</td></tr><tr><td><strong>已运行时间</strong></td><td>98 天+（自 2026 年 3 月 3 日起）</td></tr></tbody></table>
+| 项目 | 内容 |
+|------|------|
+| **服务器** | `192.168.23.22` |
+| **操作系统** | Ubuntu Server，内核 6.8.0-85-generic |
+| **服务名** | `wechat-alert.service` (systemd 守护进程) |
+| **脚本路径** | `/opt/alert/wechat.py` |
+| **Python 环境** | `/opt/alert/venv/` |
+| **运行用户** | `root` |
+| **重启策略** | `Restart=always`，失败后 10 秒自动拉起 |
+| **已运行时间** | 98 天+（自 2026 年 3 月 3 日起） |
 
-<h3 id="工作流程">工作流程</h3>
+### 工作流程
 
-<pre><code class="language-plaintext">┌─────────────────────┐          ┌──────────────────────┐  企业微信 API   ┌──────────────┐
+```
+┌─────────────────────┐          ┌──────────────────────┐  企业微信 API   ┌──────────────┐
 │ Zabbix 数据库       │  网闸同步  │ wechat-alert 服务    │ ────────────►  │ 企业微信      │
 │ 192.168.25.52:3306  │ ────────► │ 192.168.23.22       │                │ 手机通知      │
 │ alerts 表           │          │ /opt/alert/wechat.py │                └──────────────┘
-└─────────────────────┘          └──────────────────────┘</code></pre>
+└─────────────────────┘          └──────────────────────┘
+```
 
-<h2 id="二架构与设计">二、架构与设计</h2>
+## 二、架构与设计
 
-<h3 id="21-核心机制">2.1 核心机制</h3>
+### 2.1 核心机制
 
-<table><thead><tr><th>机制</th><th>说明</th></tr></thead><tbody><tr><td><strong>纯只读模式</strong></td><td>只 <code>SELECT</code> 不 <code>UPDATE/INSERT</code>，不影响 Zabbix 数据库状态</td></tr><tr><td><strong>增量去重</strong></td><td>基于 <code>alertid</code> 递增标记，内存中记录已处理的最大 ID</td></tr><tr><td><strong>定时轮询</strong></td><td>每 <strong>10 秒</strong> 查询一次 <code>alerts</code> 表</td></tr><tr><td><strong>失败重试</strong></td><td>发送失败会保留 ID，下一轮自动重试</td></tr><tr><td><strong>异常自检</strong></td><td>连续 3 次失败触发「自检告警」通知管理员（冷却 5 分钟）</td></tr><tr><td><strong>自动恢复</strong></td><td>systemd <code>Restart=always</code>，进程崩溃自动拉起</td></tr></tbody></table>
+| 机制 | 说明 |
+|------|------|
+| **纯只读模式** | 只 `SELECT` 不 `UPDATE/INSERT`，不影响 Zabbix 数据库状态 |
+| **增量去重** | 基于 `alertid` 递增标记，内存中记录已处理的最大 ID |
+| **定时轮询** | 每 **10 秒** 查询一次 `alerts` 表 |
+| **失败重试** | 发送失败会保留 ID，下一轮自动重试 |
+| **异常自检** | 连续 3 次失败触发「自检告警」通知管理员（冷却 5 分钟） |
+| **自动恢复** | systemd `Restart=always`，进程崩溃自动拉起 |
 
-<h3 id="22-去重策略">2.2 去重策略</h3>
+### 2.2 去重策略
 
-<p>基于 <code>alertid</code> 的增量进度标记：内存中记录已处理的最大 ID，查询时只取 <code>alertid &gt; last_processed_id</code> 的新增数据。发送成功才推进标记，失败则保持不动，下一轮自动重试。</p>
+基于 `alertid` 的增量进度标记：内存中记录已处理的最大 ID，查询时只取 `alertid > last_processed_id` 的新增数据。发送成功才推进标记，失败则保持不动，下一轮自动重试。
 
-<h2 id="三部署配置">三、部署配置</h2>
+## 三、部署配置
 
-<h3 id="31-systemd-服务单元">3.1 systemd 服务单元</h3>
+### 3.1 systemd 服务单元
 
-<p><strong>路径</strong>: <code>/etc/systemd/system/wechat-alert.service</code></p>
+**路径**: `/etc/systemd/system/wechat-alert.service`
 
-<pre><code class="language-ini">[Unit]
+```ini
+[Unit]
 Description=WeChat Alert Daemon for Zabbix
 After=network.target
 
@@ -56,11 +76,13 @@ StandardOutput=journal
 StandardError=journal
 
 [Install]
-WantedBy=multi-user.target</code></pre>
+WantedBy=multi-user.target
+```
 
-<h3 id="32-服务管理命令">3.2 服务管理命令</h3>
+### 3.2 服务管理命令
 
-<pre><code class="language-bash"># 查看状态
+```bash
+# 查看状态
 systemctl status wechat-alert.service
 
 # 查看日志
@@ -73,13 +95,15 @@ systemctl restart wechat-alert.service
 systemctl stop wechat-alert.service
 
 # 开机自启
-systemctl enable wechat-alert.service</code></pre>
+systemctl enable wechat-alert.service
+```
 
-<h2 id="四脚本代码">四、脚本代码</h2>
+## 四、脚本代码
 
-<p>基于 <code>alertid</code> 增量进度标记，不依赖 <code>status</code> 字段，适配网闸同步场景。</p>
+基于 `alertid` 增量进度标记，不依赖 `status` 字段，适配网闸同步场景。
 
-<pre><code class="language-python">#!/usr/bin/env python3
+```python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 微信告警守护进程（纯只读版 - 适配网闸同步场景）
@@ -162,7 +186,7 @@ def send_wechat_message_raw(token, subject, message):
 
 def get_token_for_self_alert():
     """专用于自检告警的 token 获取（独立重试）"""
-    url = f'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={CORPID}&amp;corpsecret={CORPSECRET}'
+    url = f'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={CORPID}&corpsecret={CORPSECRET}'
     try:
         with urllib.request.urlopen(url, timeout=10) as resp:
             data = json.loads(resp.read().decode('utf-8'))
@@ -176,7 +200,7 @@ def send_self_alert(reason):
     """发送「告警代理自身异常」通知"""
     global last_self_alert_time
     now = time.time()
-    if now - last_self_alert_time &lt; SELF_ALERT_COOLDOWN:
+    if now - last_self_alert_time < SELF_ALERT_COOLDOWN:
         return
 
     log(f"🚨 触发自检告警：{reason}")
@@ -203,7 +227,7 @@ def send_self_alert(reason):
 
 def get_wechat_token():
     global token_fail_count
-    url = f'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={CORPID}&amp;corpsecret={CORPSECRET}'
+    url = f'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={CORPID}&corpsecret={CORPSECRET}'
     try:
         with urllib.request.urlopen(url, timeout=10) as resp:
             data = json.loads(resp.read().decode('utf-8'))
@@ -216,7 +240,7 @@ def get_wechat_token():
         log(f"💥 获取 token 异常：{e}")
 
     token_fail_count += 1
-    if token_fail_count &gt;= SELF_ALERT_THRESHOLD:
+    if token_fail_count >= SELF_ALERT_THRESHOLD:
         send_self_alert(f"连续 {token_fail_count} 次无法获取企业微信 token")
     return None
 
@@ -238,20 +262,20 @@ def process_alerts():
             row = cursor.fetchone()
             current_max = row['max_id'] if row and row['max_id'] else 0
 
-            if current_max &gt; 0:
+            if current_max > 0:
                 last_processed_id = current_max
                 log(f"🚀 初始化完成：当前数据库最大 alertid 为 {last_processed_id}")
-                log(f"   将仅监控 ID &gt; {last_processed_id} 的新增告警")
+                log(f"   将仅监控 ID > {last_processed_id} 的新增告警")
                 return
             else:
                 log("⚠️ 数据库中暂无告警数据")
                 return
 
-        # 查询新增告警（只查 alertid &gt; last_processed_id 的数据）
+        # 查询新增告警（只查 alertid > last_processed_id 的数据）
         cursor.execute("""
             SELECT alertid, subject, message
             FROM alerts
-            WHERE alertid &gt; %s
+            WHERE alertid > %s
             ORDER BY alertid ASC
             LIMIT 50
         """, (last_processed_id,))
@@ -289,7 +313,7 @@ def process_alerts():
     except (pymysql.Error, OSError) as e:
         log(f"💥 数据库错误：{e}")
         db_fail_count += 1
-        if db_fail_count &gt;= SELF_ALERT_THRESHOLD:
+        if db_fail_count >= SELF_ALERT_THRESHOLD:
             send_self_alert(f"连续 {db_fail_count} 次无法连接数据库 {DB_CONFIG['host']}")
     except Exception as e:
         log(f"💥 未知异常：{e}")
@@ -317,24 +341,35 @@ if __name__ == '__main__':
             log(f"🔥 主循环崩溃：{e}")
             send_self_alert(f"主循环崩溃：{str(e)[:100]}")
 
-        time.sleep(CHECK_INTERVAL)</code></pre>
+        time.sleep(CHECK_INTERVAL)
+```
 
-<h2 id="五运维参考">五、运维参考</h2>
+## 五、运维参考
 
-<h3 id="51-文件清单">5.1 文件清单</h3>
+### 5.1 文件清单
 
-<table><thead><tr><th>路径</th><th>说明</th></tr></thead><tbody><tr><td><code>/opt/alert/wechat.py</code></td><td>当前运行的主脚本</td></tr><tr><td><code>/opt/alert/wechat.py.bak</code></td><td>备份（2026-02-28）</td></tr><tr><td><code>/opt/alert/venv/</code></td><td>Python 虚拟环境（含 pymysql）</td></tr><tr><td><code>/etc/systemd/system/wechat-alert.service</code></td><td>systemd 服务单元</td></tr></tbody></table>
+| 路径 | 说明 |
+|------|------|
+| `/opt/alert/wechat.py` | 当前运行的主脚本 |
+| `/opt/alert/wechat.py.bak` | 备份（2026-02-28） |
+| `/opt/alert/venv/` | Python 虚拟环境（含 pymysql） |
+| `/etc/systemd/system/wechat-alert.service` | systemd 服务单元 |
 
-<h3 id="52-依赖">5.2 依赖</h3>
+### 5.2 依赖
 
-<pre><code class="language-bash"># Python 依赖（通过 venv 管理）
+```bash
+# Python 依赖（通过 venv 管理）
 pip install pymysql
 
 # 运行时仅需
 # - Python 3.x
 # - pymysql（连接 MySQL）
-# - urllib（标准库，调用企业微信 API）</code></pre>
+# - urllib（标准库，调用企业微信 API）
+```
 
-<h3 id="53-企业微信-api">5.3 企业微信 API</h3>
+### 5.3 企业微信 API
 
-<table><thead><tr><th>接口</th><th>用途</th></tr></thead><tbody><tr><td><code>GET /cgi-bin/gettoken</code></td><td>获取 access_token</td></tr><tr><td><code>POST /cgi-bin/message/send</code></td><td>发送应用消息</td></tr></tbody></table>
+| 接口 | 用途 |
+|------|------|
+| `GET /cgi-bin/gettoken` | 获取 access_token |
+| `POST /cgi-bin/message/send` | 发送应用消息 |
