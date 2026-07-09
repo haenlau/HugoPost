@@ -340,48 +340,6 @@ main#content pre code {
     padding: 0;
 }
 
-main#content .code-block {
-    position: relative;
-    margin: 20px 0;
-}
-
-main#content .code-block pre,
-main#content .code-block .highlight {
-    margin: 0;
-}
-
-main#content .code-block .highlight {
-    overflow-x: auto;
-    border-radius: 8px;
-}
-
-main#content .code-block .highlight pre {
-    background: transparent;
-    border-radius: 0;
-}
-
-main#content .code-copy {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    border: 0;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 0.78em;
-    line-height: 1;
-    color: #f5f7fa;
-    background: rgba(255, 255, 255, 0.12);
-    cursor: pointer;
-}
-
-main#content .code-copy:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-main#content .code-copy.is-copied {
-    background: rgba(85, 183, 114, 0.32);
-}
-
 main#content .footnotes {
     font-size: 0.9em;
 }
