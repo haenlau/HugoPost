@@ -253,10 +253,12 @@ systemctl restart ocserv
 ```
 
 ## 三、常见问题
-1. 端口占用：若 443 端口被 Nginx/Apache 占用，可修改配置文件中的 `tcp-port`/`udp-port` 为其他端口（如 4433），并同步更新防火墙规则。
-2. 网卡名称：Ubuntu/CentOS 网卡名称可能为 `ens33`/`eth0` 等，使用 `ip addr` 命令查看实际网卡名。
-3. 证书生成失败：确保已安装 `gnutls-bin`（Ubuntu）或 `gnutls-utils`（CentOS）。
-```
+
+| 问题 | 处理建议 |
+|------|----------|
+| 端口占用 | 若 443 端口被 Nginx / Apache 占用，可将 `tcp-port` / `udp-port` 改为其他端口（如 4433），并同步更新防火墙规则。 |
+| 网卡名称不一致 | Ubuntu / CentOS 的网卡名称可能为 `ens33`、`eth0` 等，先用 `ip addr` 确认实际网卡名。 |
+| 证书生成失败 | 确保已安装 `gnutls-bin`（Ubuntu）或 `gnutls-utils`（CentOS）。 |
 
 ### 总结
 1. **CentOS** 依赖 EPEL 源安装 Ocserv，证书默认存放路径为 `/etc/pki/ocserv/`，防火墙使用 firewalld；

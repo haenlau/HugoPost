@@ -174,15 +174,29 @@ SMB 共享配置：
 
 ## 服务管理
 
-| 操作类别 | 命令 | 说明 |
-|----------|------|------|
-| 状态检查 | `systemctl status inspection` | 检查后端服务状态 |
-| | `systemctl status nginx` | 检查 Nginx 状态 |
-| | `systemctl is-enabled inspection` | 检查是否开机自启 |
-| 启停操作 | `systemctl restart/stop/start inspection` | 重启/停止/启动后端 |
-| 查看日志 | `journalctl -u inspection -f` | 实时跟踪后端日志 |
-| | `journalctl -u inspection -n 100` | 查看最近 100 行 |
-| | `tail -f /var/log/nginx/access.log` | 实时跟踪 Nginx 日志 |
+### 状态检查
+
+```bash
+systemctl status inspection
+systemctl status nginx
+systemctl is-enabled inspection
+```
+
+### 启停操作
+
+```bash
+systemctl restart inspection
+systemctl stop inspection
+systemctl start inspection
+```
+
+### 日志查看
+
+```bash
+journalctl -u inspection -f
+journalctl -u inspection -n 100
+tail -f /var/log/nginx/access.log
+```
 
 ### Systemd 服务配置
 
@@ -205,11 +219,26 @@ WantedBy=multi-user.target
 
 ## 数据备份与恢复
 
-| 操作 | 命令 |
-|------|------|
-| 备份数据库 | `cp /opt/inspection/backend/data/inspection.db /opt/inspection/backend/data/inspection_\$(date +%Y%m%d).db` |
-| 备份报告 | `tar -czf /tmp/reports_\$(date +%Y%m%d).tar.gz /opt/inspection/backend/reports/` |
-| 恢复数据库 | `systemctl stop inspection && cp /opt/inspection/backend/data/inspection.db.bak /opt/inspection/backend/data/inspection.db && systemctl start inspection` |
+### 备份数据库
+
+```bash
+cp /opt/inspection/backend/data/inspection.db \
+  /opt/inspection/backend/data/inspection_$(date +%Y%m%d).db
+```
+
+### 备份报告
+
+```bash
+tar -czf /tmp/reports_$(date +%Y%m%d).tar.gz /opt/inspection/backend/reports/
+```
+
+### 恢复数据库
+
+```bash
+systemctl stop inspection
+cp /opt/inspection/backend/data/inspection.db.bak /opt/inspection/backend/data/inspection.db
+systemctl start inspection
+```
 
 ## 常见问题排查
 
@@ -252,10 +281,19 @@ cd /opt/inspection/frontend && npm run build
 
 ## 部署流程
 
-| 部署类型 | 操作 |
-|----------|------|
-| 后端更新 | `scp -r ./backend/* root@YOUR_SERVER_IP:/opt/inspection/backend/ && ssh root@YOUR_SERVER_IP "systemctl restart inspection"` |
-| 前端更新 | `scp -r ./frontend/* root@YOUR_SERVER_IP:/opt/inspection/frontend/ && ssh root@YOUR_SERVER_IP "cd /opt/inspection/frontend && npm run build"` |
+### 后端更新
+
+```bash
+scp -r ./backend/* root@YOUR_SERVER_IP:/opt/inspection/backend/
+ssh root@YOUR_SERVER_IP "systemctl restart inspection"
+```
+
+### 前端更新
+
+```bash
+scp -r ./frontend/* root@YOUR_SERVER_IP:/opt/inspection/frontend/
+ssh root@YOUR_SERVER_IP "cd /opt/inspection/frontend && npm run build"
+```
 
 ### 一键部署脚本
 

@@ -29,7 +29,7 @@ draft = false
 
 ### 工作流程
 
-```
+```text
 ┌─────────────────────┐          ┌──────────────────────┐  企业微信 API   ┌──────────────┐
 │ Zabbix 数据库       │  网闸同步  │ wechat-alert 服务    │ ────────────►  │ 企业微信      │
 │ 192.168.25.52:3306  │ ────────► │ 192.168.23.22       │                │ 手机通知      │
@@ -357,14 +357,18 @@ if __name__ == '__main__':
 
 ### 5.2 依赖
 
-```bash
-# Python 依赖（通过 venv 管理）
-pip install pymysql
+依赖说明：
 
-# 运行时仅需
-# - Python 3.x
-# - pymysql（连接 MySQL）
-# - urllib（标准库，调用企业微信 API）
+| 组件 | 用途 |
+|------|------|
+| Python 3.x | 运行时环境 |
+| `pymysql` | 连接 MySQL / Zabbix 数据库 |
+| `urllib` | Python 标准库，用于调用企业微信 API |
+
+安装命令：
+
+```bash
+pip install pymysql
 ```
 
 ### 5.3 企业微信 API

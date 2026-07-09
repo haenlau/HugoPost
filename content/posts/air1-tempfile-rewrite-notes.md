@@ -8,10 +8,12 @@ aliases = ["/posts/air1-tempfile-rewrite-notes/"]
 categories = ["笔记"]
 draft = false
 +++
-> **仓库**: <https://github.com/haenlau/TempFile>
-> **线上地址**: <https://tmp.air1.cn/>
-> **当前部署**: Cloudflare Pages + Pages Functions / Advanced Worker，GitHub 自动构建
-> **最新状态**: 已回退到最大上传 99 MiB 的稳定版本
+| 项目 | 内容 |
+|------|------|
+| 仓库 | <https://github.com/haenlau/TempFile> |
+| 线上地址 | <https://tmp.air1.cn/> |
+| 当前部署 | Cloudflare Pages + Pages Functions / Advanced Worker，GitHub 自动构建 |
+| 最新状态 | 已回退到最大上传 99 MiB 的稳定版本 |
 
 记录 Air1 TempFile 从"手动粘贴 Worker JS 部署"改造成"GitHub 推送 + Cloudflare Pages 自动构建"的过程，也记录了后来尝试 WebDAV 分片大文件上传、发现问题、最终回退到 99 MiB 稳定版本的完整经过。
 
@@ -23,12 +25,14 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 
 当前版本核心策略：
 
-- **最大上传限制**：99 MiB
-- **小文件存储**：Cloudflare KV（≤24 MiB）
-- **可选大文件后端**：R2、S3、WebDAV（24 MiB - 99 MiB）
-- **超过 99 MiB**：直接拒绝，不分片，不妥协
-- **上传接口**：公开，无需口令
-- **部署方式**：GitHub 推送 → Cloudflare 自动构建
+| 项目 | 说明 |
+|------|------|
+| 最大上传限制 | 99 MiB |
+| 小文件存储 | Cloudflare KV（≤24 MiB） |
+| 可选大文件后端 | R2、S3、WebDAV（24 MiB - 99 MiB） |
+| 超过 99 MiB | 直接拒绝，不分片，不妥协 |
+| 上传接口 | 公开，无需口令 |
+| 部署方式 | GitHub 推送 → Cloudflare 自动构建 |
 
 一句话：**当前目标不是做超大文件传输工具，而是做一个稳定、轻量、适合临时分享的文件中转站。**
 
@@ -107,17 +111,16 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 
 ### GitHub 仓库
 
-```text
-haenlau/TempFile
-```
-
-本地开发路径：`本地项目路径/TempFile`
+| 项目 | 值 |
+|------|----|
+| GitHub 仓库 | `haenlau/TempFile` |
+| 本地开发路径 | `本地项目路径/TempFile` |
 
 ---
 
 ## 5. 当前项目结构
 
-```
+```text
 src/
 ├── index.ts          # Worker 入口、路由和上传流程
 ├── html.ts           # 旧版上传页面
@@ -321,33 +324,28 @@ f988268 Revert "Fix chunked WebDAV downloads"
 
 ### 11.1 最稳配置 — 仅 KV（≤24 MiB）
 
-```
-KV namespace binding: TEMP_STORE
-```
+| 类型 | 值 | 说明 |
+|------|----|------|
+| KV namespace binding | `TEMP_STORE` | 小文件内容与 metadata 均写入 KV |
 
 ### 11.2 推荐中等文件配置 — KV + R2（≤99 MiB）
 
-```
-KV namespace binding:   TEMP_STORE
-R2 bucket binding:      R2_BUCKET
-Environment variable:   LARGE_STORAGE_BACKEND=r2
-```
-
-可选：
-
-```
-PUBLIC_BASE_URL=https://tmp.air1.cn/
-```
+| 类型 | 值 | 说明 |
+|------|----|------|
+| KV namespace binding | `TEMP_STORE` | 保存短链索引和 metadata |
+| R2 bucket binding | `R2_BUCKET` | 保存 24 MiB 以上文件本体 |
+| Environment variable | `LARGE_STORAGE_BACKEND=r2` | 指定大文件后端为 R2 |
+| 可选变量 | `PUBLIC_BASE_URL=https://tmp.air1.cn/` | 强制返回正式下载域名 |
 
 ### 11.3 WebDAV 配置（24 MiB - 99 MiB）
 
-```
-KV namespace binding:   TEMP_STORE
-Environment variable:   LARGE_STORAGE_BACKEND=webdav
-Environment variable:   WEBDAV_URL=https://your-webdav-host/path/
-Secret:                 WEBDAV_ACCOUNT=...
-Secret:                 WEBDAV_PASSWORD=***
-```
+| 类型 | 值 | 说明 |
+|------|----|------|
+| KV namespace binding | `TEMP_STORE` | 保存短链索引和 metadata |
+| Environment variable | `LARGE_STORAGE_BACKEND=webdav` | 指定大文件后端为 WebDAV |
+| Environment variable | `WEBDAV_URL=https://your-webdav-host/path/` | WebDAV 根地址 |
+| Secret | `WEBDAV_ACCOUNT=...` | WebDAV 账号 |
+| Secret | `WEBDAV_PASSWORD=***` | WebDAV 密码 |
 
 > 注意：当前 WebDAV 不是分片模式，超过 99 MiB 仍然会拒绝。
 

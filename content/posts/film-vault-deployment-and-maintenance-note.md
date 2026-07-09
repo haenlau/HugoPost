@@ -8,6 +8,8 @@ aliases = ["/posts/film-vault-deployment-and-maintenance-note/"]
 categories = ["笔记"]
 draft = false
 +++
+本文覆盖范围：
+
 - 拉取代码
 - 理解目录结构
 - 本地预览
@@ -447,9 +449,11 @@ return json({
 
 连接 GitHub 仓库后：
 
-- Framework preset：`None`
-- Build command：留空
-- Build output directory：`.`
+| 项目 | 值 |
+|------|----|
+| Framework preset | `None` |
+| Build command | 留空 |
+| Build output directory | `.` |
 
 ### 10.3 `wrangler.example.toml`
 
@@ -470,21 +474,19 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 
 创建一个 KV namespace，并绑定：
 
-`FILM_VAULT_KV`
+| 项目 | 值 |
+|------|----|
+| KV namespace binding | `FILM_VAULT_KV` |
 
 ### 10.5 必要的 Secrets
 
 在 Cloudflare Pages 中配置：
 
-- `TMDB_API_KEY`
-- `ADMIN_PASSWORD`
-- `SESSION_SECRET`
-
-含义：
-
-- `TMDB_API_KEY`：TMDB API 密钥
-- `ADMIN_PASSWORD`：线上管理员登录密码
-- `SESSION_SECRET`：会话签名密钥
+| Secret | 用途 |
+|--------|------|
+| `TMDB_API_KEY` | TMDB API 密钥 |
+| `ADMIN_PASSWORD` | 线上管理员登录密码 |
+| `SESSION_SECRET` | 会话签名密钥 |
 
 ### 10.6 Worker 的职责
 
