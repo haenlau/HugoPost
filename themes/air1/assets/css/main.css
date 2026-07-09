@@ -128,11 +128,13 @@ main#content ul#posts small {
 }
 
 main#content ul#posts li a {
+    color: #313a3d;
     text-decoration: none;
 }
 
 main#content ul#posts li a:hover {
-    color: #369aff;
+    color: #313a3d;
+    text-decoration: underline;
 }
 
 main#content ul#posts li a:hover small {
