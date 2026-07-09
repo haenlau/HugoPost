@@ -1,5 +1,5 @@
 +++
-title = "Air1 TempFile 改造笔记"
+title = "Air1 TempFile 重构记录"
 date = "2026-07-06"
 lastmod = "2026-07-06"
 description = "记录 Air1 TempFile 从手动粘贴 Worker JS 部署，改造成 GitHub 推送 + Cloudflare Pages 自动构建的全过程，以及 WebDAV 分片上传的尝试、踩坑和回退。"

@@ -1,5 +1,5 @@
 +++
-title = "B/S架构机房巡检系统技术文档"
+title = "机房巡检系统架构说明"
 date = "2026-06-23"
 lastmod = "2026-06-23"
 description = "基于 FastAPI + Vue3 的每日值班巡检系统，支持 20 个巡检点数据采集、图片压缩、Word 报告生成及 SMB 共享归档。"

@@ -1,5 +1,5 @@
 +++
-title = "将 ESXi 虚拟机迁移到本地 VMware Workstation"
+title = "ESXi 虚拟机迁移到 VMware Workstation"
 date = "2026-06-04"
 lastmod = "2026-06-04"
 description = "使用 VMware vCenter Converter Standalone 将 ESXi 8.0 上的 Windows 10 虚拟机完整迁移到 Windows 11 主机的 VMware Workstation，保留所有应用和数据。"

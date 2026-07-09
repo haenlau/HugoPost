@@ -1,5 +1,5 @@
 +++
-title = "Zabbix 企业微信告警推送服务（wechat-alert）"
+title = "Zabbix 企业微信告警推送服务"
 date = "2026-04-15"
 lastmod = "2026-04-15"
 description = "基于 Python 的 Zabbix 告警推送守护进程，适配网闸同步场景，轮询 Zabbix 数据库 alerts 表，通过企业微信 API 实时推送告警到手机。"

@@ -1,5 +1,5 @@
 +++
-title = "Film Vault 影视墙部署与维护笔记"
+title = "Film Vault 部署与维护记录"
 date = "2026-05-11"
 lastmod = "2026-05-11"
 description = "记录Film Vault影视墙从代码拉取、本地预览、维护生成，到Cloudflare Pages部署、KV/Secrets配置，以及管理员权限、线上逻辑与常见问题排查的全流程，助力高效部署与稳定维护。"

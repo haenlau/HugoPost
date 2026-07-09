@@ -1,5 +1,5 @@
 +++
-title = "使用 Sysmon 监控 DNS 查询定位恶意域名访问进程"
+title = "Sysmon 定位恶意域名访问进程"
 date = "2026-05-22"
 lastmod = "2026-05-22"
 description = "通过安装配置 Sysmon 开启 DNS 查询日志（事件 ID 22），在 Windows 事件查看器中定位频繁外联恶意域名的进程。"

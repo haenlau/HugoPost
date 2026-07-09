@@ -1,5 +1,5 @@
 +++
-title = "Ocserv（AnyConnect）跨系统配置全指南"
+title = "Ocserv 跨系统安装配置指南"
 date = "2026-01-20"
 lastmod = "2026-01-20"
 description = "CentOS、Ubuntu系统下Ocserv的安装、SSL证书配置、用户管理及防火墙设置全流程。"
