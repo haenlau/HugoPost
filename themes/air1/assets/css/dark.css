@@ -57,6 +57,18 @@ main#content nav.post-footer-nav a {
     color: #a7a7a7;
 }
 
+main#content aside.post-sidebar-toc h4 {
+    color: #8f8f8f;
+}
+
+main#content aside.post-sidebar-toc nav#TableOfContents a {
+    color: #9f9f9f;
+}
+
+main#content aside.post-sidebar-toc nav#TableOfContents a:hover {
+    color: #d5d5d5;
+}
+
 main#content thead {
     background: #1f1f1f;
 }
@@ -78,6 +90,10 @@ main#content details {
 main#content pre {
     background: #0f1115;
     color: #f5f7fa;
+}
+
+main#content article.has-sidebar-toc aside.post-sidebar-toc {
+    border-left-color: #343434;
 }
 {{- if not (eq .Site.Params.dark "on") -}}
 }

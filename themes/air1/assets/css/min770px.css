@@ -50,3 +50,21 @@ main#content pre {
     padding: 1.5rem 2.2rem;
 }
 }
+
+@media (min-width: 1120px) {
+body {
+    width: 600px;
+}
+
+main#content article.has-sidebar-toc aside.post-sidebar-toc {
+    display: block;
+    position: fixed;
+    top: 150px;
+    left: calc(50% + 390px);
+    width: 170px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    padding-left: 14px;
+    border-left: 1px solid #ececec;
+}
+}
