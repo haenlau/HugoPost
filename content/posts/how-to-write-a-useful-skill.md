@@ -9,16 +9,6 @@ categories = ["笔记"]
 draft = false
 +++
 
-这篇笔记是我看完 SkillHub 技能商店文章《如何写出真正好用的Skill？》之后做的整理。原文地址：
-
-<https://mp.weixin.qq.com/s/xhmYZVOcE1kfaNzs-8Cn7g?wxwork_userid=15177689860&scene=1&click_id=1055722142#wechat_redirect>
-
-原文发布时间：`2026-07-08 18:00`
-
-本文不是转载，而是把原文的核心观点按“定义、写法、拆分、安全、落地”重新梳理成一份适合后续复习和落地执行的笔记。
-
----
-
 ## 1. Skill 到底是什么
 
 如果把 AI 编程助手看成一个能力很强、但不懂本项目细节的新同事，那么 Skill 就是给它补上的“团队操作手册”。
