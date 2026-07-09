@@ -14,7 +14,11 @@
     <meta name="author" content="{{ . }}">
     {{ end }}
     <meta name="robots" content="index, follow">
-    {{ printf `<link rel="shortcut icon" href="%s">` ("favicon.ico" | absURL) | safeHTML }}
+    {{ $defaultFavicon := "favicon.ico" | absURL -}}
+    {{ $favicon := .Site.Params.favicon | default $defaultFavicon -}}
+    {{ $faviconType := cond (hasSuffix $favicon ".svg") "image/svg+xml" "image/x-icon" -}}
+    <link rel="icon" type="{{ $faviconType }}" href="{{ $favicon | safeURL }}">
+    <link rel="shortcut icon" href="{{ $favicon | safeURL }}">
     {{ with .OutputFormats.Get "rss" -}}
         {{ printf `<link rel="%s" type="%s" href="%s" title="%s">` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
     {{ end -}}
