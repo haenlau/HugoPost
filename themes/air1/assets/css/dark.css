@@ -57,15 +57,16 @@ main#content nav.post-footer-nav a {
     color: #a7a7a7;
 }
 
-main#content aside.post-sidebar-toc h4 {
+main#content .post-layout > aside.post-sidebar-toc h4 {
     color: #8f8f8f;
 }
 
-main#content aside.post-sidebar-toc nav#TableOfContents a {
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents a {
     color: #9f9f9f;
 }
 
-main#content aside.post-sidebar-toc nav#TableOfContents a:hover {
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents a:hover {
+    border-left-color: #555555;
     color: #d5d5d5;
 }
 
@@ -92,7 +93,7 @@ main#content pre {
     color: #f5f7fa;
 }
 
-main#content article.has-sidebar-toc aside.post-sidebar-toc {
+main#content .post-layout.has-sidebar-toc > aside.post-sidebar-toc {
     border-left-color: #343434;
 }
 {{- if not (eq .Site.Params.dark "on") -}}

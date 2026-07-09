@@ -183,52 +183,58 @@ main#content nav.post-footer-nav a {
     font-size: 0.92em;
 }
 
-main#content aside.post-sidebar-toc {
+main#content .post-layout {
+    position: relative;
+}
+
+main#content .post-layout > aside.post-sidebar-toc {
     display: none;
 }
 
-main#content aside.post-sidebar-toc h4 {
-    margin: 0 0 10px;
-    font-size: 0.78em;
+main#content .post-layout > aside.post-sidebar-toc h4 {
+    margin: 0 0 11px;
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
     color: #9a9a9a;
 }
 
-main#content aside.post-sidebar-toc nav#TableOfContents {
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents {
     margin: 0;
 }
 
-main#content aside.post-sidebar-toc nav#TableOfContents ul,
-main#content aside.post-sidebar-toc nav#TableOfContents ol {
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents ul,
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents ol {
     list-style: none;
     margin: 0;
     padding-left: 0;
 }
 
-main#content aside.post-sidebar-toc nav#TableOfContents li {
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents li {
     margin: 0;
     padding: 0;
 }
 
-main#content aside.post-sidebar-toc nav#TableOfContents ul ul,
-main#content aside.post-sidebar-toc nav#TableOfContents ol ol,
-main#content aside.post-sidebar-toc nav#TableOfContents ul ol,
-main#content aside.post-sidebar-toc nav#TableOfContents ol ul {
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents ul ul,
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents ol ol,
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents ul ol,
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents ol ul {
     margin-top: 4px;
     padding-left: 12px;
 }
 
-main#content aside.post-sidebar-toc nav#TableOfContents a {
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents a {
     display: block;
     color: #8b8b8b;
-    font-size: 0.84em;
+    font-size: 13px;
     line-height: 1.65;
+    padding: 3px 0 3px 12px;
+    border-left: 2px solid transparent;
     text-decoration: none;
 }
 
-main#content aside.post-sidebar-toc nav#TableOfContents a:hover {
+main#content .post-layout > aside.post-sidebar-toc nav#TableOfContents a:hover {
+    border-left-color: #d4d4d4;
     color: #4f4f4f;
     text-decoration: none;
 }

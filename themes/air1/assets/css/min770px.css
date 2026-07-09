@@ -51,20 +51,20 @@ main#content pre {
 }
 }
 
-@media (min-width: 1120px) {
+@media (min-width: 1280px) {
 body {
     width: 600px;
 }
 
-main#content article.has-sidebar-toc aside.post-sidebar-toc {
+main#content .post-layout.has-sidebar-toc > aside.post-sidebar-toc {
     display: block;
     position: fixed;
-    top: 150px;
-    left: calc(50% + 390px);
-    width: 170px;
-    max-height: calc(100vh - 180px);
+    top: 96px;
+    left: calc(50% + 360px);
+    width: 220px;
+    max-height: calc(100vh - 128px);
     overflow-y: auto;
-    padding-left: 14px;
+    padding-left: 0;
     border-left: 1px solid #ececec;
 }
 }
