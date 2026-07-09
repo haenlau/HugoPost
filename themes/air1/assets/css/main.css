@@ -393,6 +393,49 @@ main#content pre {
     color: #f5f7fa;
 }
 
+main#content .code-block {
+    position: relative;
+    margin: 20px 0;
+}
+
+main#content .code-block pre {
+    margin: 0;
+    padding-right: 6rem;
+}
+
+main#content .code-copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 6px;
+    padding: 3px 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #d8dee9;
+    font-size: 12px;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+main#content .code-copy-button:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+main#content .code-copy-button.is-copied {
+    color: #b8f3c6;
+}
+
+main#content .code-copy-button.is-selected {
+    color: #f4d58d;
+}
+
+main#content .code-copy-button.is-failed {
+    color: #ffb4b4;
+}
+
 main#content pre code {
     padding: 0;
 }

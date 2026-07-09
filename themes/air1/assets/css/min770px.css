@@ -49,6 +49,17 @@ main#content pre {
     margin-left: -3.8%;
     padding: 1.5rem 2.2rem;
 }
+
+main#content .code-block {
+    width: 108%;
+    margin: 20px 0 20px -3.8%;
+}
+
+main#content .code-block pre {
+    width: 100%;
+    margin: 0;
+    padding: 1.5rem 6rem 1.5rem 2.2rem;
+}
 }
 
 @media (min-width: 1280px) {

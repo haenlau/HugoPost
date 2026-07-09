@@ -7,5 +7,9 @@
         {{- block "main" . }}{{- end }}
         </main>
         {{- partial "footer.html" . -}}
+        {{- if eq .Section "posts" -}}
+            {{ $codeCopy := resources.Get "js/code-copy.js" | minify | fingerprint -}}
+            <script src="{{ $codeCopy.RelPermalink }}" integrity="{{ $codeCopy.Data.Integrity }}" defer></script>
+        {{- end -}}
     </body>
 </html>

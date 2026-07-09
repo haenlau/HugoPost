@@ -93,6 +93,18 @@ main#content pre {
     color: #f5f7fa;
 }
 
+main#content .code-copy-button {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    color: #cfd6e4;
+}
+
+main#content .code-copy-button:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
 main#content .post-layout.has-sidebar-toc > aside.post-sidebar-toc {
     border-left-color: #343434;
 }
