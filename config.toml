@@ -12,7 +12,7 @@ pygmentsUseClasses = true
 [params]
   description = "Air1，个人博客。部分笔记。"
   copyright = "Part of Air1 Quick Tools · Powered by Cloudflare"
-  favicon = "/favicon.svg"
+  favicon = "/favicon-adaptive.svg"
   dark = "auto"
   highlight = true
   siteAuthor = "Air1"

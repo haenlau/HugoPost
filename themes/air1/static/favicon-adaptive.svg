@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="geometricPrecision">
+  <title>Air1</title>
+  <style>
+    .outline {
+      fill: none;
+      stroke: #263238;
+    }
+
+    .accent {
+      fill: none;
+      stroke: #007dfa;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .outline {
+        stroke: #e6edf1;
+      }
+
+      .accent {
+        stroke: #4db8ff;
+      }
+    }
+  </style>
+  <g stroke-width="4.25" stroke-linecap="round" stroke-linejoin="round">
+    <path class="outline" d="M8 31.5 56 8 40 56 31 38 17 48 23.5 33.5Z"/>
+    <path class="accent" d="M23.5 33.5 56 8 31 38"/>
+    <path class="outline" d="M44 27v20"/>
+  </g>
+</svg>
