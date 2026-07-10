@@ -1,7 +1,7 @@
 +++
 title = "Zabbix 企业微信告警推送服务"
 date = "2026-04-15"
-lastmod = "2026-04-15"
+lastmod = "2026-07-10"
 description = "基于 Python 的 Zabbix 告警推送守护进程，适配网闸同步场景，轮询 Zabbix 数据库 alerts 表，通过企业微信 API 实时推送告警到手机。"
 url = "/zabbix-wechat-alert-daemon/"
 aliases = ["/posts/zabbix-wechat-alert-daemon/"]
@@ -14,26 +14,28 @@ draft = false
 
 解决方案：利用网闸将 Zabbix 数据库单向同步到一台可联网的中转服务器，告警推送脚本部署在中转服务器上，只读同步库的 `alerts` 表，通过企业微信 API 将告警推送到手机。
 
+> 说明：本文中的服务器地址、部署路径和运行时信息均已脱敏，示例值需要按实际环境替换。
+
 ## 一、服务概述
 
 | 项目 | 内容 |
 |------|------|
-| **服务器** | `192.168.23.22` |
-| **操作系统** | Ubuntu Server，内核 6.8.0-85-generic |
+| **服务器** | `RELAY_SERVER_IP`（示例） |
+| **操作系统** | Ubuntu Server |
 | **服务名** | `wechat-alert.service` (systemd 守护进程) |
-| **脚本路径** | `/opt/alert/wechat.py` |
-| **Python 环境** | `/opt/alert/venv/` |
+| **脚本路径** | `/opt/wechat-alert/app.py` |
+| **Python 环境** | `/opt/wechat-alert/venv/` |
 | **运行用户** | `root` |
 | **重启策略** | `Restart=always`，失败后 10 秒自动拉起 |
-| **已运行时间** | 98 天+（自 2026 年 3 月 3 日起） |
+| **运行状态** | 长期稳定运行 |
 
 ### 工作流程
 
 ```text
 ┌─────────────────────┐          ┌──────────────────────┐  企业微信 API   ┌──────────────┐
 │ Zabbix 数据库       │  网闸同步  │ wechat-alert 服务    │ ────────────►  │ 企业微信      │
-│ 192.168.25.52:3306  │ ────────► │ 192.168.23.22       │                │ 手机通知      │
-│ alerts 表           │          │ /opt/alert/wechat.py │                └──────────────┘
+│ ZABBIX_DB_IP:3306    │ ────────► │ RELAY_SERVER_IP      │                │ 手机通知      │
+│ alerts 表           │          │ /opt/wechat-alert/   │                └──────────────┘
 └─────────────────────┘          └──────────────────────┘
 ```
 
@@ -68,8 +70,8 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/alert
-ExecStart=/opt/alert/venv/bin/python /opt/alert/wechat.py
+WorkingDirectory=/opt/wechat-alert
+ExecStart=/opt/wechat-alert/venv/bin/python /opt/wechat-alert/app.py
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -350,9 +352,9 @@ if __name__ == '__main__':
 
 | 路径 | 说明 |
 |------|------|
-| `/opt/alert/wechat.py` | 当前运行的主脚本 |
-| `/opt/alert/wechat.py.bak` | 备份（2026-02-28） |
-| `/opt/alert/venv/` | Python 虚拟环境（含 pymysql） |
+| `/opt/wechat-alert/app.py` | 当前运行的主脚本 |
+| `/opt/wechat-alert/app.py.bak` | 主脚本备份 |
+| `/opt/wechat-alert/venv/` | Python 虚拟环境（含 pymysql） |
 | `/etc/systemd/system/wechat-alert.service` | systemd 服务单元 |
 
 ### 5.2 依赖

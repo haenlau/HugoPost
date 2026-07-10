@@ -43,8 +43,8 @@
         {{ $resources = $resources | append (resources.Get "css/syntax.css") -}}
     {{ end -}}
 
-    {{ $css := $resources | resources.Concat "css/style.css" | minify }}
-    {{ printf `<link rel="stylesheet" href="%s">` $css.RelPermalink | safeHTML }}
+    {{ $css := $resources | resources.Concat "css/style.css" | minify | fingerprint -}}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
 
     <link rel="canonical" href="{{ .Permalink }}" />
     <meta property="og:title" content="{{ $pageTitle }}">

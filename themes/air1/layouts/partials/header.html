@@ -1,5 +1,9 @@
 <header id="banner">
+    {{- if .IsHome }}
+    <h1><a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a></h1>
+    {{- else }}
     <h2><a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a></h2>
+    {{- end }}
     <nav>
         <ul>
             {{ range .Site.Menus.main.ByWeight -}}

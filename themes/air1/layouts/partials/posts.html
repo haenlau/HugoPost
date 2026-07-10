@@ -1,4 +1,8 @@
-<h3>{{ i18n "posts.title" }}</h3>
+{{- if .IsHome }}
+<h2 class="list-title">{{ i18n "posts.title" }}</h2>
+{{- else }}
+<h1 class="list-title">{{ i18n "posts.title" }}</h1>
+{{- end }}
 <ul id="posts">
 {{- $pages := where site.RegularPages "Section" "posts" -}}
 {{- $paginator := .Paginate $pages -}}
