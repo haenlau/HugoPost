@@ -22,6 +22,10 @@ header#banner {
     margin: 25px 0;
 }
 
+header#banner.home-banner {
+    margin-bottom: 16px;
+}
+
 header#banner a {
     color: #313a3d;
     text-decoration: none;
@@ -109,6 +113,11 @@ main#content abbr {
 }
 
 /* index.html styles */
+main#content.home-content > p:first-child {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
 main#content .list-title,
 main#content .page-title {
     font-size: 16px;
