@@ -3,6 +3,9 @@
 {{ $hasToc := gt (len (findRE "<li" $toc)) 0 }}
 <div class="post-layout{{ if $hasToc }} has-sidebar-toc{{ end }}">
     <article>
+        {{- if .Params.hideTitle }}
+        <h1 class="visually-hidden">{{ .Title }}</h1>
+        {{- else }}
         <header id="post-header">
             <h1>{{ .Title }}</h1>
             {{- if and (eq .Section "posts") (isset .Params "date") -}}
@@ -15,6 +18,7 @@
             </div>
             {{- end -}}
         </header>
+        {{- end }}
         {{- .Content -}}
         {{- if eq .Section "posts" }}
         <nav class="post-footer-nav" aria-label="post navigation">
