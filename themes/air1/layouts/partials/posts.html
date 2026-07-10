@@ -1,5 +1,8 @@
 {{- if .IsHome }}
-<h2 class="list-title">{{ i18n "posts.title" }}</h2>
+<h2 class="list-title">
+    {{- i18n "posts.title" -}}
+    <a class="all-posts-link" href="{{ "/posts/" | relLangURL }}" aria-label="all posts">all</a>
+</h2>
 {{- else }}
 <h1 class="list-title">{{ i18n "posts.title" }}</h1>
 {{- end }}
