@@ -162,10 +162,6 @@ main#content ul#posts li a:hover {
     text-decoration: underline;
 }
 
-main#content ul#posts li a:hover small {
-    color: inherit;
-}
-
 main#content nav.pagination {
     display: flex;
     gap: 10px;
