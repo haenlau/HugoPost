@@ -2,7 +2,7 @@
 author = "haenlau"
 title = "浏览器有限制端口这件事"
 url = "/browser-restricted-ports-10080/"
-date = "2026-07-15T06:34:53+00:00"
+date = "2026-07-15T06:43:03+00:00"
 description = "随手用了 10080 端口测试 Web 服务，死活打不开，排查了半天发现是浏览器内置的黑名单。"
 tags = [
   "技术",
@@ -16,21 +16,7 @@ tags = [
 
 把端口改成 18080 后，网页立刻恢复正常。
 
-![wechat_01.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097284296_wechat_01.png)
-
-换机器、换浏览器，Chrome 下提示：
-
-![wechat_05.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097281021_wechat_05.png)
-
-Firefox 下也提示：
-
-![wechat_04.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097290248_wechat_04.png)
-
-把 Firefox 的提示信息发给 AI，AI 才恍然大悟。
-
-![wechat_06.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097292229_wechat_06.png)
-
-把端口改成 18080 后，网页立刻恢复正常。
+![img_1.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097788546_img_1.png)
 
 ---
 
@@ -38,15 +24,24 @@ Firefox 下也提示：
 
 浏览器为了安全，在代码里硬编码了一个端口黑名单，写进了规范里。遇到这些端口时，浏览器会直接拒绝建立连接，而不是把请求发出去。所以服务端怎么看都是正常的，问题出在中间那层。
 
-![wechat_02.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097289721_wechat_02.png)
-
-![wechat_03.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097293278_wechat_03.png)
-
 这个黑名单里大部分是 2000 以下的系统端口（echo、ssh、smtp 这些），但也有例外——**10080 是唯一一个高地址段的禁用端口**。很多人会把它当作 80 的"升级版"来用，结果就踩坑了。
 
-![wechat_06.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097298018_wechat_06.png)
+![img_2.png](https://pic.air1.cn/file/post/browser-restricted-ports-10080/1784097786458_img_2.png)
 
 完整的受限端口列表在 Fetch 规范里可以查到，Chrome 的实现对应 `net/base/port_util.cc`，Firefox 对应 `nsIOService.cpp`，都是公开源码，不是隐藏行为。
+
+---
+
+## 排查路径
+
+遇到"服务正常但浏览器打不开"，先按这条路径走：
+
+1. **确认服务本身正常**：`ss -tlnp | grep 端口` 确认监听状态，`curl 127.0.0.1:端口` 确认本地回环正常
+2. **排除本地防火墙**：`iptables -L` 和云控制台安全组先看一眼
+3. **换个端口复查**：把 10080 改成 18080 或 8080，立刻能验证是不是黑名单命中
+4. **查官方名单**：Chrome 看 `net/base/port_util.cc`，Firefox 看 `nsIOService.cpp`，Fetch 规范里有完整列表
+
+这条路径比反复换浏览器、交 AI 诊断效率高得多。
 
 ---
 
