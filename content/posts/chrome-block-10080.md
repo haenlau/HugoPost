@@ -1,7 +1,7 @@
 +++
 author = "haen"
-title = "Google Chrome 封锁 10080 端口，防止 NAT Slipstreaming 攻击"
-url = "/chrome-blocks-port-10080-nat-slipstreaming/"
+title = "Chrome 封锁 10080 端口"
+url = "/chrome-block-10080/"
 date = "2026-02-06"
 description = "端口 10080 一直是最容易被忽略的安全盲区。这个端口号与 80 仅差一个前置零，常被当作无需 root 权限的 HTTP 服务替代端口使用。但正因如此，它也成了 NAT Slipstreaming 攻击的温床。Chrome 和 Firefox 近两年接连将其列入黑名单，背后是一整条从协议设计到浏览器封禁的攻防链路。"
 tags = [
@@ -16,6 +16,8 @@ tags = [
 ## 什么是 NAT Slipstreaming
 
 NAT Slipstreaming 是一类利用 NAT 防火墙与路由器应用层网关（ALG）配合漏洞进行的内网渗透攻击。攻击者诱骗访问者浏览器发起看似无害的 HTTP 请求，实际却让路由器在 NAT 表中创建一条穿越规则，从而把外部端口映射到内部主机上。一旦映射建立，攻击者就能直接访问内网中原本不可达的服务。
+
+![NAT Slipstreaming 攻击示意图](https://pic.air1.cn/file/post/chrome-block-10080/1784099860269_img_2.jpg)
 
 2020 年，安全研究员提出了 NAT Slipstreaming 2.0 版本，攻击面进一步扩大。新版本不再局限于特定端口，只要目标端口经过了路由器的 ALG 处理，就会被纳入攻击范围。这意味着内网中大量依赖特定端口通信的服务——从监控设备到管理后台——都暴露在映射风险之下。
 
