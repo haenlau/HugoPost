@@ -9,8 +9,6 @@ tags = [
 ]
 +++
 
-# 让 AI Agent 开口说话
-
 > 通过 MiMo TTS VoiceClone，让任意 AI 助手具备语音克隆能力，将文本转化为自然语音并发送。
 
 ---
