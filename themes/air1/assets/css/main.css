@@ -217,13 +217,14 @@ main#content article > h2 {
 main#content article > h3 {
     font-size: 17px;
     font-size: 1.7rem;
-    margin-top: 2rem;
+    margin-top: 1.25rem;
 }
 
 main#content article > h2 + h3 {
-    margin-top: 1.2rem;
+    margin-top: 0.65rem;
 }
 
+main#content article > h3 + p,
 main#content article > h3 + ul,
 main#content article > h3 + ol {
     margin-top: 5px;
