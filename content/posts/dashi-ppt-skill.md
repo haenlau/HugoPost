@@ -9,17 +9,6 @@ tags = [
 ]
 +++
 
-+++
-author = "haen"
-title = "用 dashi-ppt-skill 写 PPT，体验出乎意料地好"
-url = "/dashi-ppt-skill/"
-date = "2026-06-20"
-description = "把文档丢给 AI Agent，几分钟生成一套可编辑的 PPT，还能在浏览器里直接改内容、换版式、调图表。"
-tags = [
-  "记录",
-]
-+++
-
 前阵子折腾 AI 做 PPT 踩了不少坑，要么生成后不能改，要么结构是对的、视觉却没法看。
 
 最近试用了一个叫 **dashi-ppt-skill** 的项目，体验比预期好很多。它不是简单的“帮你写大纲”，而是真正输出一份**可编辑、自带控制台、能导出真实 PPTX** 的演示文稿。
