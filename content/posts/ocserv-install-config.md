@@ -1,6 +1,6 @@
 +++
 title = "Ocserv 跨系统安装配置指南"
-date = "2026-01-20"
+date = "2025-12-22"
 lastmod = "2026-01-20"
 description = "CentOS、Ubuntu系统下Ocserv的安装、SSL证书配置、用户管理及防火墙设置全流程。"
 url = "/ocserv-install-config/"

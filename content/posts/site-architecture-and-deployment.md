@@ -1,6 +1,6 @@
 +++
 title = "网站架构与部署说明"
-date = "2025-11-02"
+date = "2025-09-13"
 lastmod = "2025-11-02"
 description = "记录这个 Hugo + Cloudflare Pages 站点的目录结构、渲染方式、部署链路和日常发布流程。"
 url = "/site-architecture-and-deployment/"
