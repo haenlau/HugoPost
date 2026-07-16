@@ -220,27 +220,48 @@ main#content article > h3 {
     margin-top: 2rem;
 }
 
+main#content article.post-article {
+    line-height: 1.65;
+}
+
+main#content article.post-article > p {
+    margin: 0 0 1.2rem;
+}
+
+main#content article.post-article > h2 {
+    margin-top: 2.4rem;
+    margin-bottom: 0;
+}
+
+main#content article.post-article > h2 + p {
+    margin-top: 5px;
+}
+
 main#content article.post-article > h3 {
-    margin-top: 0.65rem;
+    margin-top: 1.4rem;
+    margin-bottom: 0;
 }
 
 main#content article.post-article > h2 + h3 {
-    margin-top: 0.65rem;
+    margin-top: 0.8rem;
 }
 
-main#content article.post-article > h3 + p,
+main#content article.post-article > h3 + p {
+    margin-top: 5px;
+}
+
+main#content article.post-article > ul,
+main#content article.post-article > ol {
+    margin: 0 0 1.2rem;
+}
+
 main#content article.post-article > h3 + ul,
 main#content article.post-article > h3 + ol {
     margin-top: 5px;
 }
 
-/* Keep a paragraph followed by a subheading as tight as h2 → h3. */
-main#content article.post-article > p:has(+ h3) {
-    margin-bottom: 5px;
-}
-
-main#content article.post-article > p:has(+ h3) + h3 {
-    margin-top: 0.65rem;
+main#content article.post-article > hr {
+    margin: 1.8rem 0;
 }
 
 main#content header#post-header > div {
