@@ -24,7 +24,7 @@ tags = [
 
 最近试用了一个叫 **dashi-ppt-skill** 的项目，体验比预期好很多。它不是简单的“帮你写大纲”，而是真正输出一份**可编辑、自带控制台、能导出真实 PPTX** 的演示文稿。
 
-项目地址：`https://github.com/chuspeeism/dashi-ppt-skill`
+项目地址：[chuspeeism/dashi-ppt-skill](https://github.com/chuspeeism/dashi-ppt-skill)
 
 ---
 
