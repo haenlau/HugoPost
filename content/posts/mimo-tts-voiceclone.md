@@ -1,31 +1,31 @@
 +++
 author = "haen"
-title = "MiMo TTS VoiceClone"
+title = "TTS VoiceClone 让 Agent 具有发送语音能力"
 url = "/mimo-tts-voiceclone/"
 date = "2026-06-16"
-description = "MiMo TTS VoiceClone 使用指南：从参考音频克隆声音、生成任意文本语音的完整方案，含前置准备、核心脚本、使用方法、模型选择和成本参考。"
+description = "MiMo TTS VoiceClone 使用指南：从参考音频克隆声音、生成任意文本语音的完整方案，含前置准备、核心脚本、使用方法、模型选择和平台兼容性说明。"
 tags = [
   "记录",
 ]
 +++
 
-# MiMo TTS VoiceClone
+# TTS VoiceClone 让 Agent 具有发送语音能力
 
-> 让任意AI助手具备语音克隆能力的完整指南
+> 通过 MiMo TTS VoiceClone，让任意 AI 助手具备语音克隆能力，将文本转化为自然语音并发送。
 
 ---
 
 ## 🔧 前置准备
 
 ### 1. 获取API Key
-- 访问小米MiMo开放平台申请API Key
-- 当前使用的API地址: `https://token-plan-cn.xiaomimimo.com/v1`
+- 访问小米 MiMo 开放平台申请 API Key
+- 当前使用的 API 地址: `https://token-plan-cn.xiaomimimo.com/v1`
 
 ### 2. 准备参考音频
-- 格式: MP3 或 WAV
-- 建议: 16kHz采样率，64kbps码率（约80KB）
-- 内容: 清晰的说话音频，10-30秒为宜
-- 优化: 文件越小，API响应越快
+- 格式：MP3 或 WAV
+- 建议：16kHz 采样率，64kbps 码率（约 80KB）
+- 内容：清晰的说话音频，10-30 秒为宜
+- 优化：文件越小，API 响应越快
 
 ```bash
 # 转换参考音频为优化格式
@@ -65,7 +65,7 @@ def get_api_key():
     key = os.environ.get("XIAOMI_API_KEY")
     if key and key != "***":
         return key
-    # 或者从.env文件读取
+    # 或者从 .env 文件读取
     env_path = os.path.expanduser("~/.env")
     if os.path.exists(env_path):
         with open(env_path) as f:
@@ -106,7 +106,7 @@ def call_mimo_tts(text, model="mimo-v2.5-tts-voiceclone", voice=None,
         ref_b64 = load_ref_voice()
         if not ref_b64:
             raise RuntimeError(f"Reference voice not found: {REF_VOICE_PATH}")
-        # 根据文件扩展名设置MIME类型
+        # 根据文件扩展名设置 MIME 类型
         ext = os.path.splitext(REF_VOICE_PATH)[1].lower()
         mime = "audio/mp3" if ext == ".mp3" else "audio/wav"
         voice_data = f"data:{mime};base64,{ref_b64}"
@@ -246,26 +246,26 @@ export XIAOMI_BASE_URL="https://token-plan-cn.xiaomimimo.com/v1"
 
 ## 📌 关键注意事项
 
-### 1. API地址
-当前使用: `https://token-plan-cn.xiaomimimo.com/v1`
+### 1. API 地址
+当前使用：`https://token-plan-cn.xiaomimimo.com/v1`
 如有变动，设置环境变量 `XIAOMI_BASE_URL` 覆盖
 
 ### 2. 认证方式
-- 支持两种方式:
-  - Header: `api-key: YOUR_KEY`
-  - Header: `Authorization: Bearer YOUR_KEY`
+- 支持两种方式：
+  - Header：`api-key: YOUR_KEY`
+  - Header：`Authorization: Bearer YOUR_KEY`
 
 ### 3. 参考音频要求
-- VoiceClone模式必须提供参考音频
-- 音频会被base64编码后上传（每次调用都上传）
-- 文件越大，API响应越慢
+- VoiceClone 模式必须提供参考音频
+- 音频会被 base64 编码后上传（每次调用都上传）
+- 文件越大，API 响应越慢
 
-### 4. 音频格式MIME类型
+### 4. 音频格式 MIME 类型
 ```python
-# MP3文件
+# MP3 文件
 voice_data = f"data:audio/mp3;base64,{ref_b64}"
 
-# WAV文件
+# WAV 文件
 voice_data = f"data:audio/wav;base64,{ref_b64}"
 ```
 
@@ -283,8 +283,8 @@ voice_data = f"data:audio/wav;base64,{ref_b64}"
 ```
 
 ### 6. 输出格式
-- API返回WAV格式
-- 如需OGG（用于Telegram语音），用ffmpeg转换:
+- API 返回 WAV 格式
+- 如需 OGG（用于 Telegram 语音），用 ffmpeg 转换：
 ```bash
 ffmpeg -y -i input.wav -c:a libopus -b:a 64k output.ogg
 ```
@@ -301,32 +301,37 @@ ffmpeg -y -i input.wav -c:a libopus -b:a 64k output.ogg
 
 ---
 
-## ⚠️ 常见问题
+## 📱 平台兼容性
 
-### Q: 声音每次都不太一样？
-A: VoiceClone是概率模型，每次生成会有细微差异，但整体音色保持一致。
+### Telegram
+- **支持语音气泡**：将生成的 OGG 语音直接发送，Telegram 会以语音气泡形式呈现
+- 这是目前体验最完整的平台，适合做 AI 助手的语音回复
 
-### Q: API响应很慢？
-A: 主要瓶颈在网络和参考音频大小。优化参考音频（MP3 16kHz 64kbps）可以显著提速。
+### 其他平台
+- **微信**：目前只能以文件/消息形式发送，不支持原生语音气泡播放
+- **钉钉 / 飞书 / 企业微信**：同样不支持原生语音消息，只能作为音频文件转发
+- **通用方案**：所有平台都可通过上传 OGG/WAV 文件实现语音播放，只是不在聊天界面内显示为"语音气泡"
 
-### Q: 如何改善克隆效果？
-A: 
-- 使用高质量参考音频（清晰、无噪音）
-- 参考音频时长10-30秒为宜
-- 避免过度压缩
-
-### Q: 中文支持如何？
-A: MiMo支持中文，效果不错。这是选择它的重要原因之一。
+> 如果你主要用 Telegram，这套方案的体验最接近原生语音助手。
 
 ---
 
-## 📊 成本参考
+## ⚠️ 常见问题
 
-| 项目 | 数值 |
-|------|------|
-| 单条语音成本 | ~0.35元 |
-| 每天10条 | ~3.5元/天 |
-| 每月 | ~105元/月 |
+### Q：声音每次都不太一样？
+A：VoiceClone 是概率模型，每次生成会有细微差异，但整体音色保持一致。
+
+### Q：API 响应很慢？
+A：主要瓶颈在网络和参考音频大小。优化参考音频（MP3 16kHz 64kbps）可以显著提速。
+
+### Q：如何改善克隆效果？
+A:
+- 使用高质量参考音频（清晰、无噪音）
+- 参考音频时长 10-30 秒为宜
+- 避免过度压缩
+
+### Q：中文支持如何？
+A：MiMo 支持中文，效果不错。这是选择它的重要原因之一。
 
 ---
 
@@ -337,10 +342,10 @@ A: MiMo支持中文，效果不错。这是选择它的重要原因之一。
 | Fish Audio | ~0.1-0.2元/条 | ⭐⭐⭐⭐⭐ | 国内平台，中文最专业 |
 | ElevenLabs | 免费10000字/月 | ⭐⭐⭐⭐ | 国际标杆 |
 | MiniMax | 按字符计费 | ⭐⭐⭐⭐ | 国内大厂 |
-| 本地部署（GPT-SoVITS） | 免费（需GPU） | ⭐⭐⭐⭐⭐ | 效果最好，需要8GB+显存 |
+| 本地部署（GPT-SoVITS） | 免费（需GPU） | ⭐⭐⭐⭐⭐ | 效果最好，需要 8GB+ 显存 |
 
 ---
 
-**文档版本**: v1.0  
-**最后更新**: 2026-06-25  
-**适用模型**: MiMo V2.5 TTS
+**文档版本**：v1.0  
+**最后更新**：2026-06-25  
+**适用模型**：MiMo V2.5 TTS
