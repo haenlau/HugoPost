@@ -89,7 +89,8 @@ main#content details {
 }
 
 main#content pre {
-    background: #0f1115;
+    border-color: #343b48;
+    background: #242933;
     color: #f5f7fa;
 }
 
