@@ -220,6 +220,15 @@ main#content article > h3 {
     margin-top: 2rem;
 }
 
+main#content article > h2 + h3 {
+    margin-top: 1.2rem;
+}
+
+main#content article > h3 + ul,
+main#content article > h3 + ol {
+    margin-top: 5px;
+}
+
 main#content header#post-header > div {
     display: block;
     font-size: 0.85em;
