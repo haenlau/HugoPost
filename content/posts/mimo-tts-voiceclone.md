@@ -1,6 +1,6 @@
 +++
 author = "haen"
-title = "TTS VoiceClone 让 Agent 具有发送语音能力"
+title = "VoiceClone 让 AI Agent 开口说话"
 url = "/mimo-tts-voiceclone/"
 date = "2026-06-16"
 description = "MiMo TTS VoiceClone 使用指南：从参考音频克隆声音、生成任意文本语音的完整方案，含前置准备、核心脚本、使用方法、模型选择和平台兼容性说明。"
@@ -9,7 +9,7 @@ tags = [
 ]
 +++
 
-# TTS VoiceClone 让 Agent 具有发送语音能力
+# VoiceClone 让 AI Agent 开口说话
 
 > 通过 MiMo TTS VoiceClone，让任意 AI 助手具备语音克隆能力，将文本转化为自然语音并发送。
 
