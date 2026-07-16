@@ -1,6 +1,6 @@
 +++
 author = "haen"
-title = "用 dashi-ppt-skill 写 PPT，体验出乎意料地好"
+title = "dashi-ppt-skill 创作 PPT"
 url = "/dashi-ppt-skill/"
 date = "2026-06-20"
 description = "把文档丢给 AI Agent，几分钟生成一套可编辑的 PPT，还能在浏览器里直接改内容、换版式、调图表。"
