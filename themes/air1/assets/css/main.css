@@ -220,17 +220,17 @@ main#content article > h3 {
     margin-top: 2rem;
 }
 
-main#content article.article-dashi-ppt-skill > h3 {
+main#content article.post-article > h3 {
     margin-top: 1.25rem;
 }
 
-main#content article.article-dashi-ppt-skill > h2 + h3 {
+main#content article.post-article > h2 + h3 {
     margin-top: 0.65rem;
 }
 
-main#content article.article-dashi-ppt-skill > h3 + p,
-main#content article.article-dashi-ppt-skill > h3 + ul,
-main#content article.article-dashi-ppt-skill > h3 + ol {
+main#content article.post-article > h3 + p,
+main#content article.post-article > h3 + ul,
+main#content article.post-article > h3 + ol {
     margin-top: 5px;
 }
 

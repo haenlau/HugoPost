@@ -2,7 +2,7 @@
 {{ $toc := .TableOfContents }}
 {{ $hasToc := gt (len (findRE "<li" $toc)) 0 }}
 <div class="post-layout{{ if $hasToc }} has-sidebar-toc{{ end }}">
-    <article{{ with .File }}{{ if eq .ContentBaseName "dashi-ppt-skill" }} class="article-dashi-ppt-skill"{{ end }}{{ end }}>
+    <article{{ if eq .Section "posts" }} class="post-article"{{ end }}>
         {{- if .Params.hideTitle }}
         <h1 class="visually-hidden">{{ .Title }}</h1>
         {{- else }}
