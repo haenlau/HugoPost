@@ -48,7 +48,7 @@ Film Vault 是一个个人长期使用的**影视墙**项目。
 
 仓库根目录：
 
-`C:\Users\haenl\Documents\Codex\2026-04-23-d-1a-web-films-web-tmdb`
+`C:\path\to\films`
 
 ### 2.1 目录说明
 
@@ -564,7 +564,7 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 ### 13.1 进入仓库目录
 
 ```bash
-cd C:\Users\haenl\Documents\Codex\2026-04-23-d-1a-web-films-web-tmdb
+cd C:\path\to\films
 ```
 
 

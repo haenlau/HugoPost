@@ -39,7 +39,7 @@ pygmentsUseClasses = true
   pagerSize = 15
 
 [markup.goldmark.renderer]
-  unsafe = true
+  unsafe = false
 
 [markup.tableOfContents]
   startLevel = 2

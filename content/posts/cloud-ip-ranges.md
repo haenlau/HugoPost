@@ -10,8 +10,7 @@ draft = false
 +++
 整理了主流云服务商的部分常用公网 IPv4 地址段。**实际 IP 段可能动态变化，仅供参考**。
 
-<details>
-<summary>点击展开/阿里云</summary>
+{{< details summary="点击展开/阿里云" >}}
 
 ```text
 8.129.0.0/16
@@ -433,10 +432,9 @@ draft = false
 203.119.168.0/22
 ```
 
-</details>
+{{< /details >}}
 
-<details>
-<summary>点击展开/腾讯云</summary>
+{{< details summary="点击展开/腾讯云" >}}
 
 ```text
 1.12.0.0/16
@@ -1471,11 +1469,10 @@ draft = false
 94.191.0.0/17
 ```
 
-</details>
+{{< /details >}}
 
 
-<details>
-<summary>点击展开/华为云</summary>
+{{< details summary="点击展开/华为云" >}}
 
 ```text
 1.94.0.0/16
@@ -1949,4 +1946,4 @@ draft = false
 218.245.96.0/19
 ```
 
-</details>
+{{< /details >}}
