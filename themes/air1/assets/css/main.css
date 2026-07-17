@@ -242,7 +242,7 @@ main#content article.post-article > h2 {
 }
 
 main#content article.post-article > h3 {
-    margin-top: 1.4rem;
+    margin-top: 1.6rem;
     margin-bottom: 0.8rem;
 }
 
@@ -279,18 +279,42 @@ main#content article.post-article > table {
     margin: 1.2rem 0;
 }
 
-main#content article.post-article > ul,
-main#content article.post-article > ol {
-    margin: 0 0 1.2rem;
+main#content article.post-article > .highlight,
+main#content article.post-article > .code-block,
+main#content article.post-article > pre,
+main#content article.post-article > figure,
+main#content article.post-article > details,
+main#content article.post-article > blockquote {
+    margin-top: 1.2rem;
+    margin-bottom: 1.2rem;
 }
 
-main#content article.post-article > header#post-header + .highlight > pre,
-main#content article.post-article > header#post-header + .highlight > .code-block,
-main#content article.post-article > h2 + .highlight > pre,
-main#content article.post-article > h2 + .highlight > .code-block,
-main#content article.post-article > h3 + .highlight > pre,
-main#content article.post-article > h3 + .highlight > .code-block {
+main#content article.post-article > p:has(> img:only-child) {
+    margin-top: 1.2rem;
+    margin-bottom: 1.2rem;
+}
+
+main#content article.post-article > p > img:only-child {
+    display: block;
+}
+
+main#content article.post-article > ul,
+main#content article.post-article > ol {
+    margin: 0 0 1rem;
+}
+
+main#content article.post-article > .highlight > pre,
+main#content article.post-article > .highlight > .code-block {
     margin-top: 0;
+    margin-bottom: 0;
+}
+
+main#content article.post-article > blockquote > :first-child {
+    margin-top: 0;
+}
+
+main#content article.post-article > blockquote > :last-child {
+    margin-bottom: 0;
 }
 
 main#content article.post-article > hr {
