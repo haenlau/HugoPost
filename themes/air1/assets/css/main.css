@@ -238,12 +238,12 @@ main#content article.post-article > p {
 
 main#content article.post-article > h2 {
     margin-top: 2.4rem;
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.8rem;
 }
 
 main#content article.post-article > h3 {
     margin-top: 1.4rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
 }
 
 main#content article.post-article > h2 + *,
@@ -272,7 +272,11 @@ main#content article.post-article > h3 + pre,
 main#content article.post-article > h3 + blockquote,
 main#content article.post-article > h3 + figure,
 main#content article.post-article > h3 + details {
-    margin-top: 1rem;
+    margin-top: 1.2rem;
+}
+
+main#content article.post-article > table {
+    margin: 1.2rem 0;
 }
 
 main#content article.post-article > ul,
