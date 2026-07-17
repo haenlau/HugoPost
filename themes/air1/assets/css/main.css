@@ -255,6 +255,26 @@ main#content article.post-article > h2 + h3 {
     margin-top: 0.8rem;
 }
 
+main#content article.post-article > h2 + table,
+main#content article.post-article > h2 + .highlight,
+main#content article.post-article > h2 + .code-block,
+main#content article.post-article > h2 + pre,
+main#content article.post-article > h2 + blockquote,
+main#content article.post-article > h2 + figure,
+main#content article.post-article > h2 + details {
+    margin-top: 1.2rem;
+}
+
+main#content article.post-article > h3 + table,
+main#content article.post-article > h3 + .highlight,
+main#content article.post-article > h3 + .code-block,
+main#content article.post-article > h3 + pre,
+main#content article.post-article > h3 + blockquote,
+main#content article.post-article > h3 + figure,
+main#content article.post-article > h3 + details {
+    margin-top: 1rem;
+}
+
 main#content article.post-article > ul,
 main#content article.post-article > ol {
     margin: 0 0 1.2rem;
