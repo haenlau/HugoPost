@@ -224,30 +224,35 @@ main#content article.post-article {
     line-height: 1.65;
 }
 
+main#content article.post-article > header#post-header {
+    margin-bottom: 1.6rem;
+}
+
+main#content article.post-article > header#post-header + * {
+    margin-top: 0;
+}
+
 main#content article.post-article > p {
-    margin: 0 0 1.2rem;
+    margin: 0 0 1rem;
 }
 
 main#content article.post-article > h2 {
     margin-top: 2.4rem;
-    margin-bottom: 0;
-}
-
-main#content article.post-article > h2 + p {
-    margin-top: 5px;
+    margin-bottom: 0.7rem;
 }
 
 main#content article.post-article > h3 {
     margin-top: 1.4rem;
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
+}
+
+main#content article.post-article > h2 + *,
+main#content article.post-article > h3 + * {
+    margin-top: 0;
 }
 
 main#content article.post-article > h2 + h3 {
     margin-top: 0.8rem;
-}
-
-main#content article.post-article > h3 + p {
-    margin-top: 5px;
 }
 
 main#content article.post-article > ul,
@@ -255,9 +260,13 @@ main#content article.post-article > ol {
     margin: 0 0 1.2rem;
 }
 
-main#content article.post-article > h3 + ul,
-main#content article.post-article > h3 + ol {
-    margin-top: 5px;
+main#content article.post-article > header#post-header + .highlight > pre,
+main#content article.post-article > header#post-header + .highlight > .code-block,
+main#content article.post-article > h2 + .highlight > pre,
+main#content article.post-article > h2 + .highlight > .code-block,
+main#content article.post-article > h3 + .highlight > pre,
+main#content article.post-article > h3 + .highlight > .code-block {
+    margin-top: 0;
 }
 
 main#content article.post-article > hr {
