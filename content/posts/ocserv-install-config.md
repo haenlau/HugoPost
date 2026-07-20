@@ -24,8 +24,8 @@ mkdir ssl && cd ssl
 
 # 创建 CA 证书模板
 cat > ca.tmpl << EOF
-cn = "Innatus"
-organization = "Innatus.CN"
+cn = "air1.cn"
+organization = "air1.cn"
 serial = 1
 expiration_days = 9999
 ca
@@ -41,7 +41,7 @@ certtool --generate-self-signed --load-privkey ca-key.pem --template ca.tmpl --o
 # 创建服务器证书模板（替换为你的服务器公网IP）
 cat > server.tmpl << EOF
 cn = "你的服务器IP"
-organization = "Innatus.CN"
+organization = "air1.cn"
 expiration_days = 9999
 signing_key
 encryption_key
@@ -74,7 +74,7 @@ tcp-port = 443
 udp-port = 443
 
 # 3. 连接欢迎信息
-banner = "Welcome Innatus.CN"
+banner = "Welcome air1.cn"
 
 # 4. 最大连接数限制
 max-clients = 16
@@ -99,10 +99,10 @@ dns = 8.8.4.4
 
 ### 4. 创建/管理 VPN 用户
 ```bash
-# 创建用户（替换 Innatus 为自定义用户名）
-ocpasswd -c /etc/ocserv/ocpasswd Innatus
+# 创建用户（将 air1 替换为你要使用的用户名）
+ocpasswd -c /etc/ocserv/ocpasswd air1
 # 删除用户
-ocpasswd -c /etc/ocserv/ocpasswd -d Innatus
+ocpasswd -c /etc/ocserv/ocpasswd -d air1
 ```
 
 ### 5. 系统网络配置
@@ -152,8 +152,8 @@ mkdir ssl && cd ssl
 
 # 创建 CA 模板
 cat > ca.tmpl << EOF
-cn = "Innatus"
-organization = "Innatus.CN"
+cn = "air1.cn"
+organization = "air1.cn"
 serial = 1
 expiration_days = 9999
 ca
@@ -169,7 +169,7 @@ certtool --generate-self-signed --load-privkey ca-key.pem --template ca.tmpl --o
 # 创建服务器证书模板（替换为服务器IP）
 cat > server.tmpl << EOF
 cn = "你的服务器IP"
-organization = "Innatus.CN"
+organization = "air1.cn"
 expiration_days = 9999
 signing_key
 encryption_key
@@ -208,7 +208,7 @@ server-key = /etc/ocserv/certs/server-key.pem
 ca-cert = /etc/ocserv/certs/ca-cert.pem
 
 # 其他配置（同 CentOS）
-banner = "Welcome Innatus.CN"
+banner = "Welcome air1.cn"
 max-clients = 16
 max-same-clients = 2
 ipv4-network = 192.168.10.0
@@ -220,7 +220,7 @@ dns = 8.8.4.4
 
 ### 4. 创建 VPN 用户（同 CentOS）
 ```bash
-ocpasswd -c /etc/ocserv/ocpasswd Innatus
+ocpasswd -c /etc/ocserv/ocpasswd air1
 ```
 
 ### 5. 系统网络配置
