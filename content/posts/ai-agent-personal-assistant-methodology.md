@@ -2,7 +2,7 @@
 author = "haenlau"
 title = "AI Agent 作为个人助理的方法论"
 url = "/ai-agent-personal-assistant-methodology/"
-date = "2025-11-18"
+date = "2026-03-02"
 description = "None"
 tags = [
   "记录",
