@@ -1,7 +1,7 @@
 +++
 author = "haenlau"
 title = "X 图片批量保存器详细部署笔记"
-url = "/1111-note/"
+url = "/x-media-downloader-deploy/"
 date = "2025-11-11"
 description = "X 图片批量保存器（x_media_downloader）在 Windows 上的完整部署流程，涵盖 Chrome 扩展安装、代理配置、断点续传和常见错误排查。"
 tags = [
@@ -653,3 +653,7 @@ README.md
 ```
 
 如果需要迁移旧任务，再额外复制原图片目录、缓存文件和下载清单即可。
+
+---
+
+**原始文件下载**：[quark 网盘](https://pan.quark.cn/s/26c4426b6830)
