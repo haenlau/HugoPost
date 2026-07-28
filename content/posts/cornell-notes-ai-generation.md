@@ -2,12 +2,14 @@
 author = "haenlau"
 title = "用 AI 生成康奈尔笔记信息图的提示词模板"
 url = "/cornell-notes-ai-generation/"
-date = "2026-03-02"
+date = "2026-07-20"
 description = "None"
 tags = [
   "记录",
 ]
 +++
+
+![康奈尔笔记：内网穿透](https://pic.air1.cn/file/post/cornell-notes-ai-generation/1785199759178_img_7907852e0d61.jpg)
 
 整理了一套用 AI 生成康奈尔笔记信息图的提示词模板，适用于把任何学习主题转成可打印的 A4 信息图。
 
