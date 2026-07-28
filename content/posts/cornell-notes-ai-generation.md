@@ -1,6 +1,6 @@
 +++
 author = "haenlau"
-title = "用 AI 生成康奈尔笔记信息图的提示词模板"
+title = "用 Image 2 生成康奈尔笔记信息图"
 url = "/cornell-notes-ai-generation/"
 date = "2026-07-20"
 description = "None"
