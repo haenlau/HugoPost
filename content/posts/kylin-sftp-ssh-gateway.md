@@ -2,7 +2,7 @@
 author = "haenlau"
 title = "麒麟 V10 上的 SFTP 与网闸排查"
 url = "/kylin-sftp-ssh-gateway/"
-date = "2026-08-27T06:16:40+00:00"
+date = "2026-08-27T06:28:28+00:00"
 description = "记录银河麒麟 V10 上 SFTP、双网卡、隔离网闸和老版 JSch 因 Host Key 算法不兼容导致连接失败的排查过程。"
 tags = [
   "记录",
@@ -612,6 +612,37 @@ ssh -vvv <sftp-user>@<server-address> -p 22
 ```
 
 重新抓包时，期望看到客户端不再在 `KEXINIT` 后立即断开，而是继续进行密钥交换、`NEWKEYS`，然后才进入认证阶段。
+
+### 10.6 抓包证据：故障发生在算法协商阶段
+
+从网闸侧抓到的 TCP 流可以准确还原失败位置。过滤 `tcp.stream eq 0` 后，可以看到两端先完成 SSH 版本交换：
+
+```text
+客户端：SSH-2.0-JSCH-0.1.54
+服务端：SSH-2.0-OpenSSH_8.2
+```
+
+随后双方发送 SSH `KEXINIT`，开始交换密钥交换、主机密钥、加密和 MAC 等算法列表。这个阶段说明 TCP 连接、SSH 端口监听和版本交换都已经成功，故障不是简单的网络不通。
+
+算法列表交换后，客户端没有继续进入密钥交换，而是返回：
+
+```text
+com.jcraft.jsch.JSchException: Algorithm negotiation fail
+```
+
+紧接着可以看到客户端断开，服务端随后发送 `FIN/ACK`，并出现 `RST/ACK`。因此，失败点可以定位为：**客户端和服务端在 SSH 算法协商阶段没有选出共同的 Host Key 算法**。认证、SFTP 子系统和文件目录权限都还没有开始处理。
+
+![img_a24c324f08ac.jpg](https://pic.air1.cn/file/post/kylin-sftp-ssh-gateway/1787812112199_img_a24c324f08ac.jpg)
+
+抓包中的两端算法列表进一步印证了这一点：
+
+| 端点 | Host Key 算法 |
+| --- | --- |
+| OpenSSH 服务端 | `rsa-sha2-512`、`rsa-sha2-256`、`ssh-ed25519` |
+| 网闸侧 JSch 客户端 | `ssh-rsa`、`ssh-dss`、`ecdsa-sha2-nistp256`、`ecdsa-sha2-nistp384`、`ecdsa-sha2-nistp521` |
+| 共同算法 | 无 |
+
+这份抓包证据排除了几个容易误判的方向：端口 22 已经建立连接，SSH 版本交换已经完成，SFTP 用户还没有进入认证阶段。因此，继续修改网卡绑定、用户密码、目录权限或 SFTP 子系统，都不能解决这一次故障。真正需要调整的是服务端的 `HostKeyAlgorithms`，让它在保留原有算法的同时增加网闸客户端支持的 `ssh-rsa`。
 
 ## 11. 一个可复用的排查顺序
 
