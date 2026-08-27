@@ -2,7 +2,7 @@
 author = "haenlau"
 title = "SFTP 网闸连接失败排查"
 url = "/kylin-sftp-ssh-gateway/"
-date = "2026-08-27T06:36:24+00:00"
+date = "2026-08-27T06:39:00+00:00"
 description = "记录安全隔离网闸连接 SFTP 服务器时因 Host Key 算法不兼容导致失败的现象、抓包证据和修复方法。"
 tags = [
   "记录",
@@ -17,7 +17,7 @@ tags = [
 
 ![img_4ffde9f3e018.jpg](https://pic.air1.cn/file/post/kylin-sftp-ssh-gateway/1787812584319_img_4ffde9f3e018.jpg)
 
-从页面上看，SFTP 类型已经选择正确，问题不是把 SFTP 误配置成 FTP，而是网闸与服务器建立 SSH 会话时失败。
+从页面上看，SFTP 类型已经选择正确，SFTP 端口可达，Windows 测试 SFTP 没有问题，但网闸无法连接。
 
 ## 抓包确认连接过程
 
@@ -122,6 +122,6 @@ ssh-rsa
 
 ## 结论
 
-这次故障不是网卡绑定错误、TCP `22` 端口不通、SFTP 子系统未启用或用户密码错误，而是 `sshd` 的 `HostKeyAlgorithms` 没有包含网闸客户端支持的 `ssh-rsa`。
+这次故障的排查结果排除了网卡绑定错误、TCP `22` 端口不通、SFTP 子系统未启用和用户密码错误，最终定位为 `sshd` 的 `HostKeyAlgorithms` 没有包含网闸客户端支持的 `ssh-rsa`。
 
 服务端提供 `rsa-sha2-512`、`rsa-sha2-256`、`ssh-ed25519`，网闸客户端提供 `ssh-rsa`、`ssh-dss` 和 ECDSA 算法，双方没有交集，最终触发 `Algorithm negotiation fail`。在保留原有安全算法的前提下追加 `HostKeyAlgorithms +ssh-rsa`，是本次问题的最小兼容修复。
