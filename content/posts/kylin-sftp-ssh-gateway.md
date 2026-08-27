@@ -2,7 +2,7 @@
 author = "haenlau"
 title = "SFTP 网闸连接失败排查"
 url = "/kylin-sftp-ssh-gateway/"
-date = "2026-08-27T06:33:13+00:00"
+date = "2026-08-27T06:36:24+00:00"
 description = "记录安全隔离网闸连接 SFTP 服务器时因 Host Key 算法不兼容导致失败的现象、抓包证据和修复方法。"
 tags = [
   "记录",
@@ -15,7 +15,7 @@ tags = [
 
 网闸“文件交换”页面中有一条名为 `sync` 的同步配置，状态为“停止”，同步方向为“双向”，轮询间隔为 `3000` 毫秒。可编辑类型和不可编辑类型均为 `SFTP`。
 
-![网闸 SFTP 文件同步配置报错](https://pic.air1.cn/file/post/kylin-sftp-ssh-gateway/1787813545148_img_4ffde9f3e018.jpg)
+![img_4ffde9f3e018.jpg](https://pic.air1.cn/file/post/kylin-sftp-ssh-gateway/1787812584319_img_4ffde9f3e018.jpg)
 
 从页面上看，SFTP 类型已经选择正确，问题不是把 SFTP 误配置成 FTP，而是网闸与服务器建立 SSH 会话时失败。
 
