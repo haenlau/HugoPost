@@ -1,9 +1,9 @@
 +++
 author = "haenlau"
-title = "通过 Google Workspace 低价注册 com / net 域名"
+title = "Workspace 低价域名记录"
 url = "/google-workspace-domain-registration/"
-date = "2026-09-03T13:41:22+00:00"
-description = "记录通过 Google Workspace 低价注册 com、net 等域名的流程、续费反馈、DNS 托管、账户管理和实际风险。"
+date = "2026-09-03T14:01:56+00:00"
+description = "记录 Google Workspace 低价域名注册的流程、续费反馈、DNS 托管、账户管理和实际风险。"
 tags = [
   "记录",
 ]
