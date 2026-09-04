@@ -2,14 +2,14 @@
 author = "haenlau"
 title = "Workspace 低价域名记录"
 url = "/google-workspace-domain-registration/"
-date = "2026-09-03T14:01:56+00:00"
+date = "2026-09-04T00:59:24+00:00"
 description = "记录 Google Workspace 低价域名注册的流程、续费反馈、DNS 托管、账户管理和实际风险。"
 tags = [
   "记录",
 ]
 +++
 
-这篇记录整理了一个通过 Google Workspace 注册低价顶级域名的方案。原帖发布于 2026 年 6 月 2 日，讨论的是在 Google Workspace 注册流程中选择土耳其区域，以较低的里拉价格购买 `.com`、`.net` 等域名。
+Google Workspace 的域名注册流程曾在特定地区显示较低的顶级域名价格。原帖发布于 2026 年 6 月 2 日，讨论的是在 Workspace 注册过程中选择土耳其区域，以较低的里拉价格购买 `.com`、`.net` 等域名。
 
 原帖及评论提供了较完整的操作截图和后续反馈，但价格、地区资格、支付风控和续费政策都可能变化。本文保留方法流程和评论区中有复用价值的信息，不把个别用户的成功经历视为官方保证。
 
