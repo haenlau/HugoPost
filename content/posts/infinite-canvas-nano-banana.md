@@ -2,8 +2,8 @@
 author = "haenlau"
 title = "无限画布部署与 Nano Banana 接入"
 url = "/infinite-canvas-nano-banana/"
-date = "2026-09-12T13:46:59+00:00"
-description = "记录无限画布部署到 Cloudflare Workers，以及 Nano Banana 图像模型的两种接入路径。"
+date = "2026-09-12T13:54:13+00:00"
+description = "记录开源无限画布部署到 Cloudflare Workers，以及通过 CPA 反代接入 Nano Banana 图像模型。"
 tags = [
   "记录",
 ]
@@ -13,7 +13,7 @@ tags = [
 
 ## 一、项目背景
 
-Aixoras 的「Atlas 画布」基于开源项目 [basketikun/infinite-canvas](https://github.com/basketikun/infinite-canvas) 二次开发。上游项目采用 React 19、Vite 7、Zustand 和 LocalForage，属于纯前端 SPA，没有独立后端服务。API Key 和画布数据都保存在浏览器本地，因此可以使用静态文件托管，再配合一个 CORS 代理完成部署。
+项目基于开源项目 [basketikun/infinite-canvas](https://github.com/basketikun/infinite-canvas) 二次开发。上游项目采用 React 19、Vite 7、Zustand 和 LocalForage，属于纯前端 SPA，没有独立后端服务。API Key 和画布数据都保存在浏览器本地，因此可以使用静态文件托管，再配合一个 CORS 代理完成部署。
 
 ## 二、Cloudflare Worker 部署
 
@@ -31,7 +31,6 @@ Worker: infinite-canvas
 ### 入口地址
 
 - 主入口：[https://canvas.air1.cn](https://canvas.air1.cn)
-- 默认域名：[https://infinite-canvas.haenlau.workers.dev](https://infinite-canvas.haenlau.workers.dev)
 
 ### 本地目录
 
@@ -121,7 +120,7 @@ API Key 只保存在当前浏览器的 Local Storage 中。换浏览器、清理
 https://canvas.air1.cn
 ```
 
-或者使用 Worker 默认域名。开启本地代理后，浏览器请求会经 Worker 转发，并由 Worker 补充 CORS 响应头。对于浏览器直连受到 CORS 限制的渠道，应开启这个选项。
+开启本地代理后，浏览器请求会经 Worker 转发，并由 Worker 补充 CORS 响应头。对于浏览器直连受到 CORS 限制的渠道，应开启这个选项。
 
 ### 数据存储
 
@@ -220,7 +219,7 @@ return await generateImage({ prompt, images, params, model, http });
 - 生成期间不要关闭页面；
 - 并发请求过多可能触发 `429`，应降低并发后重试。
 
-## 五、原生 Gemini 路径
+## 五、Google Vertex AI 与 CPA 反代
 
 应用原生调用格式为：
 
@@ -236,20 +235,9 @@ x-goog-api-key: [REDACTED]
 
 对于 Gemini 3 系列图像模型，原生路径可以传递 `imageSize` 和宽高比，因此适合需要 2K 或 4K 输出的场景。
 
-### 路线一：Google AI Studio
+Google Vertex AI 通过 CPA 提供反代服务，画布通过 CPA 反代调用 Google 的图像模型。应用侧不直接访问 Google 的原生接口，而是将渠道地址配置为 CPA 反代地址，再由反代处理认证和请求转发。
 
-基本流程：
-
-1. 在 [Google AI Studio](https://aistudio.google.com) 创建 API Key；
-2. 将计费关联到 Google Cloud 项目；
-3. 新增一个 Gemini 协议渠道；
-4. 接口地址使用 [https://generativelanguage.googleapis.com](https://generativelanguage.googleapis.com)；
-5. 开启本地代理，解决部分网络环境下的直连问题；
-6. 获取模型列表后直接使用，无需自定义脚本。
-
-### 路线二：Google Cloud 反向代理
-
-也可以通过 Google Cloud 反代并进行路径重写：
+反代需要处理原生接口路径重写：
 
 ```text
 /v1beta/models/(.+):(.*)
@@ -257,11 +245,11 @@ x-goog-api-key: [REDACTED]
 /v1/publishers/google/models/$1:$2
 ```
 
-此时渠道填写反代地址，并使用 Google Cloud 对应的认证方式。真实 Key 不应写入前端源码、Git 仓库、文章或日志。
+画布中填写 CPA 反代地址，使用 CPA 提供的认证方式，并按反代服务支持的协议配置 Gemini 或 Vertex AI 渠道。真实 Key 不应写入前端源码、Git 仓库、文章或日志。
 
 ### 中转站兼容性
 
-当前测试中，部分 CPA 中转站不支持原生 `/v1beta/*` 路径，可能直接返回 `Invalid API key`。遇到这种情况，应改用 Chat Completions 兼容路径，或者切换到支持原生 Gemini 协议的代理。
+画布调用 CPA 反代时，如果原生 `/v1beta/*` 请求被转换为 `Invalid API key`，需要检查 CPA 的路径重写和认证配置，而不是在前端继续修改模型脚本。
 
 ## 六、安全注意事项
 
