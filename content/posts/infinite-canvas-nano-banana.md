@@ -2,7 +2,7 @@
 author = "haenlau"
 title = "无限画布部署与 Nano Banana 接入"
 url = "/infinite-canvas-nano-banana/"
-date = "2026-09-12T13:54:13+00:00"
+date = "2026-09-14T00:12:48+00:00"
 description = "记录开源无限画布部署到 Cloudflare Workers，以及通过 CPA 反代接入 Nano Banana 图像模型。"
 tags = [
   "记录",
@@ -143,7 +143,7 @@ gemini-3-pro-image
 | --- | --- | --- |
 | `/v1/chat/completions` + `message.images[]` | 可用 | 通过自定义模型脚本适配中转站返回格式 |
 | `/v1/images/generations` | 不可用 | 当前中转站不通过此路径处理 Gemini 图像模型 |
-| 原生 `:generateContent` + `x-goog-api-key` | 可用 | Gemini 原生协议，适合解锁更高分辨率 |
+| 原生 `:generateContent` + `x-goog-api-key` | 应用原生支持，待配 Key | 完成配置后可通过 Gemini 原生协议解锁 2K / 4K |
 
 ### 方案一：通过 Chat Completions 生图
 
