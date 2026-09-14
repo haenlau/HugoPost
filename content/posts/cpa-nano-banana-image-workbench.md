@@ -1,6 +1,6 @@
 +++
 author = "haenlau"
-title = "从 auth_not_found 到 Nano Banana Pro：用 CLIProxyAPI + GCP 试用赠金搭一个能出图的生图工作台"
+title = "CLIProxyAPI + GCP 试用金接入 Nano Banana 生图"
 url = "/cpa-nano-banana-image-workbench/"
 date = "2026-09-14T00:00:00+08:00"
 description = "记录 CLIProxyAPI 免费账号调用 gpt-image-2 失败后，切换到 GCP Vertex AI Nano Banana 图像模型的排查与接入过程。"
