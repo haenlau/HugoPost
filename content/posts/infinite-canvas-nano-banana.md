@@ -2,7 +2,7 @@
 author = "haenlau"
 title = "无限画布部署与 Nano Banana 接入"
 url = "/infinite-canvas-nano-banana/"
-date = "2026-09-14T00:12:48+00:00"
+date = "2026-09-11T00:12:48+00:00"
 description = "记录开源无限画布部署到 Cloudflare Workers，以及通过 CPA 反代接入 Nano Banana 图像模型。"
 tags = [
   "记录",
