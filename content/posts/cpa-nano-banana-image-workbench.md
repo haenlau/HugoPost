@@ -9,7 +9,7 @@ tags = [
 ]
 +++
 
-> 一次完整的踩坑记录:CPA 挂着 8 个 Codex 免费号,模型列表里明明有 `gpt-image-2`,一调就报 `auth_not_found`。本文讲清楚为什么会这样,以及如何用 Google Cloud 的 $300 试用赠金,把工作台的生图后端切换到 Vertex AI 的 Gemini 图像模型(Nano Banana 系列),最后给出可直接抄的调用文档。
+> 一次完整的踩坑记录:CPA 挂着 Codex 免费号,模型列表里明明有 `gpt-image-2`,一调就报 `auth_not_found`。本文讲清楚为什么会这样,以及如何用 Google Cloud 的 $300 试用赠金,把工作台的生图后端切换到 Vertex AI 的 Gemini 图像模型(Nano Banana 系列),最后给出可直接抄的调用文档。
 
 ## 背景
 
@@ -18,7 +18,7 @@ tags = [
 - **云主机**(Oracle 系列,Ubuntu):裸跑 CLIProxyAPI（社区俗称 CPA）,systemd 服务 `cliproxyapi.service`,配置在 `/opt/cliproxyapi/config.yaml`,监听 8317 端口,开了 TLS。
 
   项目地址：[CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)
-- **上游账号**:OAuth 登录了 8 个 ChatGPT **免费**账号,auth 文件都在 `~/.cli-proxy-api/` 下,清一色 `codex-xxx-free.json`;
+- **上游账号**:OAuth 登录了 ChatGPT **免费**账号,auth 文件都在 `~/.cli-proxy-api/` 下,清一色 `codex-xxx-free.json`;
 - **前端**:一个部署在 Cloudflare Workers 上的"无限画布"生图工作台,配置(URL / API Key / 模型名)存在浏览器 localStorage 里。
 
 目标很简单:让工作台能出图。
