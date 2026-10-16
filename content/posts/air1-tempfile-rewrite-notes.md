@@ -19,7 +19,7 @@ draft = false
 
 ---
 
-## 2. 项目背景
+## 1. 项目背景
 
 Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用于快速分享文件，7 天自动销毁。
 
@@ -38,7 +38,7 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 
 ---
 
-## 3. 改造前状态
+## 2. 改造前状态
 
 最初项目是一个直接部署在 Cloudflare Workers 上的单文件 JS，使用方式是：
 
@@ -57,7 +57,7 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 | `WECOM_WEBHOOK_URL` | 企业微信 Webhook |
 | `TEMP_STORE` | KV 空间绑定 |
 
-### 3.2. 改造动机
+### 2.1. 改造动机
 
 - 每次改代码都要手动粘贴，繁琐且容易出错
 - 没有版本管理，改坏了无法回退
@@ -66,7 +66,7 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 
 ---
 
-## 4. 改造目标
+## 3. 改造目标
 
 - ✅ GitHub 仓库化管理
 - ✅ Cloudflare Pages 自动构建（GitHub 推送即部署）
@@ -76,7 +76,7 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 - ✅ 保留 KV、R2、S3、WebDAV 多种后端支持
 - ✅ 支持企业微信 / Telegram 通知
 
-### 4.2. 为什么不提交 wrangler.toml
+### 3.1. 为什么不提交 wrangler.toml
 
 这是本项目的一个重要约定：
 
@@ -86,7 +86,7 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 
 ---
 
-## 5. Cloudflare Pages 构建配置
+## 4. Cloudflare Pages 构建配置
 
 在 Cloudflare Dashboard 新建 Pages 项目并连接 GitHub 仓库 `haenlau/TempFile`：
 
@@ -103,13 +103,13 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 - **Compatibility date**：`2026-07-06` 或更新日期
 - KV、R2、环境变量、Secrets 通过 Dashboard 添加
 
-### 5.2. 域名绑定
+### 4.1. 域名绑定
 
 绑定 `tmp.air1.cn` 到 Pages 项目。
 
 > ⚠️ 如果旧 Worker route 仍然绑定这个域名，需要先移除旧 route，否则路由冲突。
 
-### 5.3. GitHub 仓库
+### 4.2. GitHub 仓库
 
 | 项目 | 值 |
 |------|----|
@@ -118,7 +118,7 @@ Air1 TempFile 是一个部署在 Cloudflare 上的临时文件上传工具，用
 
 ---
 
-## 6. 当前项目结构
+## 5. 当前项目结构
 
 ```text
 src/
@@ -138,21 +138,21 @@ src/
 
 ---
 
-## 7. 存储策略
+## 6. 存储策略
 
-### 7.2. 小文件（≤24 MiB）
+### 6.1. 小文件（≤24 MiB）
 
 - 直接写入 `TEMP_STORE` KV
 - 文件内容和 metadata 都在 KV 中
 - 下载时直接从 KV 返回
 
-### 7.3. 中等文件（24 MiB < 大小 ≤ 99 MiB）
+### 6.2. 中等文件（24 MiB < 大小 ≤ 99 MiB）
 
 - 必须配置 `LARGE_STORAGE_BACKEND`
 - 可选后端：`r2`、`s3`、`webdav`
 - 文件本体写入后端，KV 只保存短链索引和 metadata
 
-### 7.4. 超过 99 MiB
+### 6.3. 超过 99 MiB
 
 - 前端直接提示不能超过 99MB
 - 后端也会拒绝
@@ -160,9 +160,9 @@ src/
 
 ---
 
-## 8. 上传接口
+## 7. 上传接口
 
-### 8.2. 普通上传
+### 7.1. 普通上传
 
 ```http
 POST /api/upload-public
@@ -199,7 +199,7 @@ POST /api/upload
 }
 ```
 
-### 8.3. 当前不存在的接口
+### 7.2. 当前不存在的接口
 
 以下分片接口已经回退，不再存在：
 
@@ -211,7 +211,7 @@ POST /api/upload/chunk/complete
 
 ---
 
-## 9. 下载接口
+## 8. 下载接口
 
 ```http
 GET /{id}
@@ -235,17 +235,17 @@ GET /{id}
 
 ---
 
-## 10. 通知系统
+## 9. 通知系统
 
 支持两种通知渠道，可单独启用或同时启用。
 
-### 10.2. 企业微信
+### 9.1. 企业微信
 
 | 变量 | 说明 |
 |------|------|
 | `WECOM_WEBHOOK_URL` | 企业微信机器人 Webhook 地址 |
 
-### 10.3. Telegram
+### 9.2. Telegram
 
 | 变量 | 说明 |
 |------|------|
@@ -254,7 +254,7 @@ GET /{id}
 
 > ⚠️ 两个变量必须成对配置，只填一个会导致通知失败。通知失败不会影响上传结果。
 
-### 10.4. 通知模板
+### 9.3. 通知模板
 
 ```text
 Air1 TempFile：新文件上传
@@ -271,11 +271,11 @@ Air1 TempFile：新文件上传
 
 ---
 
-## 11. WebDAV 分片上传 — 一次不成功的尝试
+## 10. WebDAV 分片上传 — 一次不成功的尝试
 
 > 这一段是历史记录，不是当前功能。
 
-### 11.2. 想法
+### 10.1. 想法
 
 - 上传上限改为 2 GiB
 - 单文件超过 99MB 走 WebDAV 分片
@@ -284,31 +284,31 @@ Air1 TempFile：新文件上传
 - 每片上传成功后写 KV 收据
 - 完成后生成短链
 
-### 11.3. 第一次方案：下载时流式拼接
+### 10.2. 第一次方案：下载时流式拼接
 
 下载时 Worker 按顺序读取 WebDAV 分片，用响应流拼接给浏览器。
 
 **问题**：真实环境里下载时只拿到一个分片。同一个链接反复下载会得到不同分片，浏览器本地得到多个残缺文件。
 
-### 11.4. 第二次方案：TransformStream
+### 10.3. 第二次方案：TransformStream
 
 改成 `TransformStream + writer.write()`，希望通过背压顺序写出所有分片。
 
 **问题**：本地测试通过，真实 Cloudflare 环境仍然不可靠。
 
-### 11.5. 第三次方案：上传完成时合并
+### 10.4. 第三次方案：上传完成时合并
 
 上传完成时把 WebDAV 分片合并成完整文件，下载只下载完整文件。
 
 **问题**：合并过程发生在 `complete` 请求里，WebDAV 较慢时容易导致前端 `Network connection lost`，用户体验变差。
 
-### 11.6. 教训
+### 10.5. 教训
 
 - **WebDAV 不是为浏览器大文件分片上传设计的协议**
 - Worker 中转分片并在边缘环境里合并大文件，容易遇到平台和网络边界
 - 为了一个临时文件工具把系统复杂度推到这个程度不值得
 
-### 11.7. 回退
+### 10.6. 回退
 
 最终回退到 99 MiB 稳定版本，三个回退提交：
 
@@ -320,15 +320,15 @@ f988268 Revert "Fix chunked WebDAV downloads"
 
 ---
 
-## 12. 当前推荐配置
+## 11. 当前推荐配置
 
-### 12.2. 最稳配置 — 仅 KV（≤24 MiB）
+### 11.1. 最稳配置 — 仅 KV（≤24 MiB）
 
 | 类型 | 值 | 说明 |
 |------|----|------|
 | KV namespace binding | `TEMP_STORE` | 小文件内容与 metadata 均写入 KV |
 
-### 12.3. 推荐中等文件配置 — KV + R2（≤99 MiB）
+### 11.2. 推荐中等文件配置 — KV + R2（≤99 MiB）
 
 | 类型 | 值 | 说明 |
 |------|----|------|
@@ -337,7 +337,7 @@ f988268 Revert "Fix chunked WebDAV downloads"
 | Environment variable | `LARGE_STORAGE_BACKEND=r2` | 指定大文件后端为 R2 |
 | 可选变量 | `PUBLIC_BASE_URL=https://tmp.air1.cn/` | 强制返回正式下载域名 |
 
-### 12.4. WebDAV 配置（24 MiB - 99 MiB）
+### 11.3. WebDAV 配置（24 MiB - 99 MiB）
 
 | 类型 | 值 | 说明 |
 |------|----|------|
@@ -351,7 +351,7 @@ f988268 Revert "Fix chunked WebDAV downloads"
 
 ---
 
-## 13. 上传 IP 获取
+## 12. 上传 IP 获取
 
 后端按以下顺序获取上传 IP：
 
@@ -362,7 +362,7 @@ f988268 Revert "Fix chunked WebDAV downloads"
 
 ---
 
-## 14. 本地开发
+## 13. 本地开发
 
 ```bash
 npm install        # 安装依赖
@@ -372,7 +372,7 @@ npm run dev        # 本地启动 Cloudflare Pages runtime
 npm run deploy     # 手动部署到 Cloudflare Pages
 ```
 
-### 14.2. 本地 .dev.vars 示例
+### 13.1. 本地 .dev.vars 示例
 
 ```ini
 LARGE_STORAGE_BACKEND=webdav
@@ -384,21 +384,21 @@ PUBLIC_BASE_URL=http://localhost:8788/
 
 ---
 
-## 15. 排障指南
+## 14. 排障指南
 
-### 15.2. 超过 24MiB 上传失败
+### 14.1. 超过 24MiB 上传失败
 
 检查 `LARGE_STORAGE_BACKEND` 是否配置。未配置时超过 KV 阈值会失败。
 
-### 15.3. 超过 99MiB 上传失败
+### 14.2. 超过 99MiB 上传失败
 
 当前预期行为。当前版本最大只支持 99 MiB，不是 bug。
 
-### 15.4. 上传成功但通知没收到
+### 14.3. 上传成功但通知没收到
 
 检查 `WECOM_WEBHOOK_URL`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`。通知失败不会影响上传，看 Cloudflare Functions 日志排查。
 
-### 15.5. 下载链接显示过期页
+### 14.4. 下载链接显示过期页
 
 可能原因：
 
@@ -408,7 +408,7 @@ PUBLIC_BASE_URL=http://localhost:8788/
 - 后端对象被清理
 - 短链 ID 不存在
 
-### 15.6. 返回链接域名不是 tmp.air1.cn
+### 14.5. 返回链接域名不是 tmp.air1.cn
 
 检查 `PUBLIC_BASE_URL`。如果需要强制返回正式域名：
 
@@ -418,7 +418,7 @@ PUBLIC_BASE_URL=https://tmp.air1.cn/
 
 ---
 
-## 16. 如果未来要支持大文件
+## 15. 如果未来要支持大文件
 
 不要再优先走 WebDAV 分片，更合理的方向是 **R2 Multipart Upload**：
 
@@ -431,7 +431,7 @@ PUBLIC_BASE_URL=https://tmp.air1.cn/
 
 ---
 
-## 17. 重要提交记录
+## 16. 重要提交记录
 
 | 提交 | 说明 |
 |------|------|
@@ -445,7 +445,7 @@ PUBLIC_BASE_URL=https://tmp.air1.cn/
 
 ---
 
-## 18. 总结
+## 17. 总结
 
 截至本文，Air1 TempFile 项目的关键状态：
 

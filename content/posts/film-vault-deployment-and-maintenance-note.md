@@ -22,7 +22,7 @@ draft = false
 
 ---
 
-## 2. 项目定位
+## 1. 项目定位
 
 Film Vault 是一个个人长期使用的**影视墙**项目。
 
@@ -44,13 +44,13 @@ Film Vault 是一个个人长期使用的**影视墙**项目。
 
 ---
 
-## 3. 仓库目录
+## 2. 仓库目录
 
 仓库根目录：
 
 `C:\path\to\films`
 
-### 3.2. 目录说明
+### 2.1. 目录说明
 
 ```text
 .
@@ -83,7 +83,7 @@ Film Vault 是一个个人长期使用的**影视墙**项目。
 
 ---
 
-## 4. 为什么 `data/*` 文件不能删
+## 3. 为什么 `data/*` 文件不能删
 
 这是项目里一个容易误判的点。
 
@@ -110,9 +110,9 @@ Film Vault 是一个个人长期使用的**影视墙**项目。
 
 ---
 
-## 5. 获取项目
+## 4. 获取项目
 
-### 5.2. 克隆仓库
+### 4.1. 克隆仓库
 
 ```bash
 git clone https://github.com/haenlau/films.git
@@ -120,7 +120,7 @@ cd films
 ```
 
 
-### 5.3. Node.js 版本
+### 4.2. Node.js 版本
 
 推荐：
 
@@ -130,9 +130,9 @@ cd films
 
 ---
 
-## 6. 本地预览
+## 5. 本地预览
 
-### 6.2. 直接双击打开
+### 5.1. 直接双击打开
 
 直接双击：
 
@@ -147,7 +147,7 @@ cd films
 
 所以即使没有本地 HTTP 服务，也能正常显示片库。
 
-### 6.3. 本地管理员模式
+### 5.2. 本地管理员模式
 
 本地管理员模式用于：
 
@@ -156,7 +156,7 @@ cd films
 - 导出片单
 - 导出完整数据
 
-#### 6.3.2. 创建本地配置文件
+#### 5.2.1. 创建本地配置文件
 
 复制模板：
 
@@ -165,7 +165,7 @@ copy admin.local.example.js admin.local.js
 ```
 
 
-#### 6.3.3. 填写本地配置
+#### 5.2.2. 填写本地配置
 
 ```js
 window.FILM_VAULT_ADMIN = {
@@ -180,7 +180,7 @@ window.FILM_VAULT_ADMIN = {
 - `admin.local.js` **不要提交到 Git**
 - 它已经在 `.gitignore` 中
 
-#### 6.3.4. 本地使用流程
+#### 5.2.3. 本地使用流程
 
 1. 双击打开 `index.html`
 2. 右上角点击 `登录管理`
@@ -193,9 +193,9 @@ window.FILM_VAULT_ADMIN = {
 
 ---
 
-## 7. 源片单与完整片库
+## 6. 源片单与完整片库
 
-### 7.2. `data/library.json`
+### 6.1. `data/library.json`
 
 这是“源片单”，适合人工维护或脚本维护。
 
@@ -236,7 +236,7 @@ window.FILM_VAULT_ADMIN = {
 - 手工维护时，优先保留 `tmdbId`
 - 如果没有 `tmdbId`，脚本会搜索匹配，但重名作品有误匹配风险
 
-### 7.3. `data/library.resolved.json`
+### 6.2. `data/library.resolved.json`
 
 这是前端直接使用的完整片库数据。
 
@@ -255,7 +255,7 @@ window.FILM_VAULT_ADMIN = {
 
 这个文件不建议手工维护，推荐脚本生成。
 
-### 7.4. 本地预览用的 JS 数据文件
+### 6.3. 本地预览用的 JS 数据文件
 
 为了兼容 `file://`，项目会额外生成：
 
@@ -281,9 +281,9 @@ window.__FILM_VAULT_RESOLVED__ = {
 
 ---
 
-## 8. 命令行维护片库
+## 7. 命令行维护片库
 
-### 8.2. 配置 `.dev.vars`
+### 7.1. 配置 `.dev.vars`
 
 在项目根目录创建：
 
@@ -296,21 +296,21 @@ TMDB_API_KEY=YOUR_TMDB_API_KEY
 ```
 
 
-### 8.3. 按名称搜索并添加影视
+### 7.2. 按名称搜索并添加影视
 
 ```bash
 npm run add:movie -- 怪奇物语
 ```
 
 
-### 8.4. 根据源片单重建完整片库
+### 7.3. 根据源片单重建完整片库
 
 ```bash
 npm run rebuild:library
 ```
 
 
-### 8.5. `package.json` 中的脚本
+### 7.4. `package.json` 中的脚本
 
 ```json
 {
@@ -327,7 +327,7 @@ npm run rebuild:library
 
 ---
 
-## 9. TMDB 接口支持范围
+## 8. TMDB 接口支持范围
 
 这个项目最终定位为“影视墙”，用于整理电影和剧集。
 
@@ -336,7 +336,7 @@ npm run rebuild:library
 - 电影：`movie`
 - 电视剧：`tv`
 
-### 9.2. 搜索逻辑
+### 8.1. 搜索逻辑
 
 管理员控制台中的“添加影视”搜索支持：
 
@@ -351,7 +351,7 @@ npm run rebuild:library
 - 本地浏览器：`/search/multi?page=...`
 - 最终只保留 `movie/tv` 类型结果
 
-### 9.3. 详情逻辑
+### 8.2. 详情逻辑
 
 添加时按 `media_type` 分流：
 
@@ -365,11 +365,11 @@ npm run rebuild:library
 
 ---
 
-## 10. 控制台中的搜索分页
+## 9. 控制台中的搜索分页
 
 这是当前版本的重要能力。
 
-### 10.2. 行为规则
+### 9.1. 行为规则
 
 - 未搜索时：不显示分页控件
 - 搜索后只有 1 页：不显示分页控件
@@ -381,7 +381,7 @@ npm run rebuild:library
 - `第 X / Y 页`
 - `下一页`
 
-### 10.3. 为什么需要分页
+### 9.2. 为什么需要分页
 
 很多影视作品存在：
 
@@ -392,7 +392,7 @@ npm run rebuild:library
 
 如果不支持翻页，第一页找不到时就无法继续筛选。
 
-### 10.4. 关键实现思路
+### 9.3. 关键实现思路
 
 ```js
 state.searchQuery = query;
@@ -429,11 +429,11 @@ return json({
 
 ---
 
-## 11. Cloudflare 部署
+## 10. Cloudflare 部署
 
 推荐使用 **Cloudflare Pages**。
 
-### 11.2. 为什么不是纯 Workers
+### 10.1. 为什么不是纯 Workers
 
 因为这个项目是：
 
@@ -445,7 +445,7 @@ return json({
 - Pages 托管静态资源
 - `_worker.js` 提供管理员接口
 
-### 11.3. Pages 构建配置
+### 10.2. Pages 构建配置
 
 连接 GitHub 仓库后：
 
@@ -455,7 +455,7 @@ return json({
 | Build command | 留空 |
 | Build output directory | `.` |
 
-### 11.4. `wrangler.example.toml`
+### 10.3. `wrangler.example.toml`
 
 ```toml
 name = "films"
@@ -470,7 +470,7 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 ```
 
 
-### 11.5. 必要的 KV 配置
+### 10.4. 必要的 KV 配置
 
 创建一个 KV namespace，并绑定：
 
@@ -478,7 +478,7 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 |------|----|
 | KV namespace binding | `FILM_VAULT_KV` |
 
-### 11.6. 必要的 Secrets
+### 10.5. 必要的 Secrets
 
 在 Cloudflare Pages 中配置：
 
@@ -488,7 +488,7 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 | `ADMIN_PASSWORD` | 线上管理员登录密码 |
 | `SESSION_SECRET` | 会话签名密钥 |
 
-### 11.7. Worker 的职责
+### 10.6. Worker 的职责
 
 `_worker.js` 主要负责：
 
@@ -498,7 +498,7 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 - 管理员添加影视：`/api/admin/add`
 - 管理员删除影视：`/api/admin/remove`
 
-### 11.8. 线上数据读写逻辑
+### 10.7. 线上数据读写逻辑
 
 线上优先读 Cloudflare KV。
 
@@ -517,15 +517,15 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 
 ---
 
-## 12. 管理员使用逻辑
+## 11. 管理员使用逻辑
 
-### 12.2. 普通访客
+### 11.1. 普通访客
 
 - 只能浏览片库
 - 只能搜索已添加的影视
 - 看不到管理功能
 
-### 12.3. 管理员
+### 11.2. 管理员
 
 1. 点击 `管理员登录`
 2. 输入密码
@@ -538,9 +538,9 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 
 ---
 
-## 13. 默认排序与前端说明
+## 12. 默认排序与前端说明
 
-### 13.2. 默认排序
+### 12.1. 默认排序
 
 站点默认按：
 
@@ -548,7 +548,7 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 
 而不是评分优先。
 
-### 13.3. 当前文案说明
+### 12.2. 当前文案说明
 
 当前项目已经统一到“影视”语义，而不是“电影”：
 
@@ -559,23 +559,23 @@ preview_id = "replace-with-your-preview-kv-namespace-id"
 
 ---
 
-## 14. Git 提交流程
+## 13. Git 提交流程
 
-### 14.2. 进入仓库目录
+### 13.1. 进入仓库目录
 
 ```bash
 cd C:\path\to\films
 ```
 
 
-### 14.3. 查看状态
+### 13.2. 查看状态
 
 ```bash
 git status
 ```
 
 
-### 14.4. 提交全部改动
+### 13.3. 提交全部改动
 
 ```bash
 git add .
@@ -584,7 +584,7 @@ git push
 ```
 
 
-### 14.5. 只提交部分文件
+### 13.4. 只提交部分文件
 
 ```bash
 git add app.js _worker.js index.html styles.css README.md
@@ -595,9 +595,9 @@ git push
 
 ---
 
-## 15. 隐私与敏感信息
+## 14. 隐私与敏感信息
 
-### 15.2. 不应提交到 GitHub 的文件
+### 14.1. 不应提交到 GitHub 的文件
 
 - `admin.local.js`
 - `.dev.vars`
@@ -605,7 +605,7 @@ git push
 - `.env.local`
 - 任何真实 API Key、密码、会话密钥
 
-### 15.3. 可以提交到仓库的内容
+### 14.2. 可以提交到仓库的内容
 
 - `admin.local.example.js`
 - `.dev.vars.example`
@@ -619,9 +619,9 @@ git push
 
 ---
 
-## 16. 常见问题与排查
+## 15. 常见问题与排查
 
-### 16.2. 线上为什么还是旧片库
+### 15.1. 线上为什么还是旧片库
 
 先检查：
 
@@ -629,7 +629,7 @@ git push
 - `FILM_VAULT_KV` 是否绑定正确
 - `data/library.resolved.json` 是否带最新 `generatedAt`
 
-### 16.3. 为什么搜索不到目标作品
+### 15.2. 为什么搜索不到目标作品
 
 常见原因：
 
@@ -644,7 +644,7 @@ git push
 - 在源片单中明确 `tmdbId`
 - 明确 `media_type`
 
-### 16.4. 为什么本地能搜，线上添加失败
+### 15.3. 为什么本地能搜，线上添加失败
 
 常见原因：
 
@@ -654,7 +654,7 @@ git push
 - `ADMIN_PASSWORD` / `SESSION_SECRET` 未配置
 - KV 绑定不正确
 
-### 16.5. 为什么 `data/*` 不能删
+### 15.4. 为什么 `data/*` 不能删
 
 因为它们负责：
 
@@ -665,9 +665,9 @@ git push
 
 ---
 
-## 17. 推荐维护方式
+## 16. 推荐维护方式
 
-### 17.2. 方案 A：本地页面维护
+### 16.1. 方案 A：本地页面维护
 
 适合直接在浏览器里操作：
 
@@ -678,7 +678,7 @@ git push
 5. 导出片单 / 导出数据
 6. 提交到 GitHub
 
-### 17.3. 方案 B：命令行批量维护
+### 16.2. 方案 B：命令行批量维护
 
 适合大规模调整：
 
@@ -686,7 +686,7 @@ git push
 2. 执行 `npm run rebuild:library`
 3. 提交到 GitHub
 
-### 17.4. 方案 C：线上 Cloudflare 管理
+### 16.3. 方案 C：线上 Cloudflare 管理
 
 适合日常在线维护：
 
@@ -697,7 +697,7 @@ git push
 
 ---
 
-## 18. 推荐环境
+## 17. 推荐环境
 
 - Node.js 18+
 - Cloudflare Pages
@@ -706,7 +706,7 @@ git push
 
 ---
 
-## 19. 结论
+## 18. 结论
 
 这个项目最终是一个：
 

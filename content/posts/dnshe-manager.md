@@ -9,7 +9,7 @@ categories = ["笔记"]
 draft = false
 +++
 
-## 2. 项目定位
+## 1. 项目定位
 
 `DNSHE-Manager` 是一个跑在 Cloudflare Workers 上的域名自动续期管理平台，目标很明确：
 
@@ -22,7 +22,7 @@ draft = false
 
 ---
 
-## 3. 背景与约束
+## 2. 背景与约束
 
 DNSHE 提供免费域名注册和 DNS 托管服务。根据原始笔记里的说明，从 `2026-01-01` 起，新注册域名采用年度注册机制，需要在到期前 `180` 天内手动续期，但续期本身仍然免费。
 
@@ -43,7 +43,7 @@ DNSHE 提供免费域名注册和 DNS 托管服务。根据原始笔记里的说
 
 ---
 
-## 4. 功能清单
+## 3. 功能清单
 
 按原始方案，这个平台包含下面几类能力：
 
@@ -62,7 +62,7 @@ DNSHE 提供免费域名注册和 DNS 托管服务。根据原始笔记里的说
 
 ---
 
-## 5. 技术选型
+## 4. 技术选型
 
 这个项目的栈其实很克制：
 
@@ -85,7 +85,7 @@ DNSHE 提供免费域名注册和 DNS 托管服务。根据原始笔记里的说
 
 ---
 
-## 6. 整体架构
+## 5. 整体架构
 
 整套系统可以分成五层：
 
@@ -117,9 +117,9 @@ Cron Trigger
 
 ---
 
-## 7. DNSHE API 设计要点
+## 6. DNSHE API 设计要点
 
-### 7.2. 基本信息
+### 6.1. 基本信息
 
 原始笔记里给出的 API 信息如下：
 
@@ -130,7 +130,7 @@ Cron Trigger
 | 限频 | `30` 次/分钟/账户 |
 | 返回格式 | JSON |
 
-### 7.3. 常用接口
+### 6.2. 常用接口
 
 | Endpoint | Action | 方法 | 用途 |
 |------|------|------|------|
@@ -143,7 +143,7 @@ Cron Trigger
 | `dns_records` | `delete` | `POST` | 删除 DNS 记录 |
 | `quota` | `list` | `GET` | 查询配额 |
 
-### 7.4. 请求示例
+### 6.3. 请求示例
 
 ```bash
 curl -X GET "https://api005.dnshe.com/index.php?m=domain_hub&endpoint=subdomains&action=list&fields=id,subdomain,rootdomain,full_domain,status,expires_at,never_expires" \
@@ -159,7 +159,7 @@ curl -X POST "https://api005.dnshe.com/index.php?m=domain_hub&endpoint=subdomain
   -d '{"subdomain_id": 12345}'
 ```
 
-### 7.5. 续期结果处理
+### 6.4. 续期结果处理
 
 续期逻辑里最重要的是不要把所有失败都当成同一种失败。
 
@@ -175,7 +175,7 @@ curl -X POST "https://api005.dnshe.com/index.php?m=domain_hub&endpoint=subdomain
 
 ---
 
-## 8. 核心源码结构
+## 7. 核心源码结构
 
 根据原始笔记，项目目录大致是这样：
 
@@ -210,9 +210,9 @@ dnshe-manager/
 
 ---
 
-## 9. 核心实现思路
+## 8. 核心实现思路
 
-### 9.2. DNSHE Client
+### 8.1. DNSHE Client
 
 `DnsheClient` 的核心职责有三件事：
 
@@ -232,7 +232,7 @@ async renewDomain(subdomainId) {
 }
 ```
 
-### 9.3. Account Manager
+### 8.2. Account Manager
 
 多账户管理器负责两件大事：
 
@@ -241,7 +241,7 @@ async renewDomain(subdomainId) {
 
 这点非常重要。对运维工具来说，“部分成功 + 部分失败可见”远比“一次失败全盘中止”更实用。
 
-### 9.4. 续期主流程
+### 8.3. 续期主流程
 
 续期主流程的判断顺序应该是：
 
@@ -255,7 +255,7 @@ async renewDomain(subdomainId) {
 
 这类流程非常适合写成明确的状态分类，而不是只留一堆日志文本。
 
-### 9.5. KV 的作用
+### 8.4. KV 的作用
 
 KV 更适合存下面这些轻量状态：
 
@@ -268,7 +268,7 @@ KV 更适合存下面这些轻量状态：
 
 ---
 
-## 10. Worker 配置
+## 9. Worker 配置
 
 一个最小可用的 `wrangler.toml` 可以长这样：
 
@@ -298,7 +298,7 @@ crons = ["0 8 * * *"]
 
 ---
 
-## 11. Secrets 设计
+## 10. Secrets 设计
 
 这个项目比较适合把所有敏感信息都放在 Workers Secrets 里，而不是写死在代码或配置文件中。
 
@@ -326,9 +326,9 @@ crons = ["0 8 * * *"]
 
 ---
 
-## 12. 部署流程
+## 11. 部署流程
 
-### 12.2. 环境准备
+### 11.1. 环境准备
 
 本地需要：
 
@@ -341,7 +341,7 @@ npm install -g wrangler
 wrangler login
 ```
 
-### 12.3. 创建 KV Namespace
+### 11.2. 创建 KV Namespace
 
 ```bash
 wrangler kv namespace create KV
@@ -349,7 +349,7 @@ wrangler kv namespace create KV
 
 把返回的 `id` 填回 `wrangler.toml`。
 
-### 12.4. 设置 Secrets
+### 11.3. 设置 Secrets
 
 ```bash
 wrangler secret put ACCOUNT_1_KEY
@@ -359,7 +359,7 @@ wrangler secret put TELEGRAM_CHAT_ID
 wrangler secret put ADMIN_PASSWORD
 ```
 
-### 12.5. 部署
+### 11.4. 部署
 
 ```bash
 wrangler deploy
@@ -371,7 +371,7 @@ wrangler deploy
 https://dnshe-manager.<subdomain>.workers.dev
 ```
 
-### 12.6. 绑定自定义域名
+### 11.5. 绑定自定义域名
 
 更稳的做法是直接在 Cloudflare Dashboard 里绑定域名，而不是把路由硬写进 `wrangler.toml`。
 
@@ -387,7 +387,7 @@ https://dnshe-manager.<subdomain>.workers.dev
 
 ---
 
-## 13. 验证方式
+## 12. 验证方式
 
 部署完成后，至少要验证四件事：
 
@@ -422,7 +422,7 @@ Invoke-RestMethod -Uri "https://your-domain/api/check" -Method POST -Headers @{ 
 
 ---
 
-## 14. 总结
+## 13. 总结
 
 `DNSHE-Manager` 这类项目的价值，不在于技术栈多复杂，而在于它把一个容易忘、但后果明显的维护动作自动化了。
 

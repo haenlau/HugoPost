@@ -8,11 +8,11 @@ aliases = ["/posts/sysmon-dns-query-logging/"]
 categories = ["笔记"]
 draft = false
 +++
-## 2. 背景
+## 1. 背景
 
 有电脑频繁外联恶意域名，需要定位是哪个进程发起的 DNS 查询。Sysmon 的 DNS 查询日志（事件 ID 22）可以记录每次 DNS 查询对应的进程，是解决此类问题的标准工具。
 
-## 3. Sysmon 安装
+## 2. Sysmon 安装
 
 Sysmon 是微软 Sysinternals 套件中的系统监控工具，下载地址：
 
@@ -36,7 +36,7 @@ Sysmon 是微软 Sysinternals 套件中的系统监控工具，下载地址：
 
 `-n` 表示不安装事件清单（已通过 `-i` 安装），可减少安装步骤。
 
-## 4. 配置 DNS 查询监控
+## 3. 配置 DNS 查询监控
 
 在 Sysmon 同目录下创建配置文件 `sysmon_dns.xml`：
 
@@ -73,7 +73,7 @@ Sysmon 是微软 Sysinternals 套件中的系统监控工具，下载地址：
 .\Sysmon64.exe -c sysmon_dns.xml
 ```
 
-## 5. 查看日志
+## 4. 查看日志
 
 打开事件查看器（`Win + R` → `eventvwr.msc`），路径：
 
@@ -88,7 +88,7 @@ Sysmon 是微软 Sysinternals 套件中的系统监控工具，下载地址：
 - 查询类型（A、AAAA、CNAME 等）
 - 查询结果
 
-## 6. Sysmon 事件 ID 速查
+## 5. Sysmon 事件 ID 速查
 
 以下是 Sysmon 所有事件类型的简要说明：
 
@@ -125,7 +125,7 @@ Sysmon 是微软 Sysinternals 套件中的系统监控工具，下载地址：
 | 29 | FileExecutableDetected | 检测到新建可执行文件 |
 | 255 | Error | Sysmon 错误 |
 
-## 7. 卸载
+## 6. 卸载
 
 如需卸载 Sysmon：
 
