@@ -364,7 +364,7 @@ systemctl restart dsh-web
 
 ## 9. 端到端验证(含 RPC 调试方法)
 
-页面能开并不等于模型能用,必须真跑一轮。dsh Web 的前后端通过一个桥接端点 `/api/<namespace>/<method>` 通信,RPC 请求结构如下。
+页面打开后,再运行一轮模型测试,确认从 Web 界面到本地模型的调用链路。dsh Web 的前后端通过一个桥接端点 `/api/<namespace>/<method>` 通信,RPC 请求结构如下。
 
 ### 9.1 请求信封
 
