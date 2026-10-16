@@ -9,7 +9,7 @@ tags = [
 ]
 +++
 
-## 1 文档目标与边界
+## 2. 文档目标与边界
 
 这是一个给值班人员使用的业务辅助平台。它把日常巡检、告警处理、办公网查询、设备操作和企业微信机器人放到同一个入口里，减少重复操作。下面记录它的部署、迁移、恢复和验收方法。
 
@@ -35,7 +35,7 @@ tags = [
 
 本文不保存任何真实密码。所有密码、Token、Bot Secret 都应从内部密码库或原服务器的 root 专用环境文件中取得。
 
-## 2 现网总体架构
+## 3. 现网总体架构
 
 ```mermaid
 flowchart LR
@@ -63,7 +63,7 @@ flowchart LR
 - Zabbix、DHCP、行为管理和防火墙均由平台后端直接调用；
 - 业务端口只监听 `<internal-endpoint>`，避免绕开统一登录。
 
-## 3 组件与端口
+## 4. 组件与端口
 
 | 组件 | systemd 服务 | 监听地址 | 用户入口 | 数据位置 |
 | --- | --- | --- | --- | --- |
@@ -77,7 +77,7 @@ flowchart LR
 
 旧的独立 `8080`、`8090` Web 入口以及旧巡检服务不再是正式架构的一部分。现网的 `zabbix-alert-web.service` 和 `inspection.service` 已停用或禁用。
 
-## 4 当前菜单与模块顺序
+## 5. 当前菜单与模块顺序
 
 平台模块由 `backend/db.py` 的 `module_registry` 统一注册，当前顺序为：
 
@@ -94,9 +94,9 @@ flowchart LR
 
 “用户管理”和“审计日志”仅 `superadmin` 可见。
 
-## 5 主机基础要求
+## 6. 主机基础要求
 
-### 5.1 推荐规格
+### 6.2. 推荐规格
 
 - Ubuntu 24.04 或更新的 LTS；现网为 Ubuntu 26.04 LTS；
 - 2 核 CPU、4 GB 内存、40 GB 以上磁盘；
@@ -105,7 +105,7 @@ flowchart LR
 - 能访问内部 APT/PyPI/NPM 源，或提前准备离线依赖；
 - 服务器地址固定或由 DHCP 保留为 `<platform-host>`。
 
-### 5.2 系统软件
+### 6.3. 系统软件
 
 ```bash
 apt update
@@ -120,7 +120,7 @@ apt install -y \
 apt install -y build-essential python3-dev libffi-dev
 ```
 
-## 6 双网卡和路由
+## 7. 双网卡和路由
 
 现网：
 
@@ -186,7 +186,7 @@ ip route get <dhcp-host>
 # 期望：第二网卡路径，src <device-source-ip>
 ```
 
-## 7 DNS 与时间
+## 8. DNS 与时间
 
 IP 主机名查询首先执行 PTR 解析，因此服务器必须使用能够解析办公网 PTR 的 DNS。现网 DNS 为 `<internal-dns>`，同时保留 `<internal-endpoint>` 作为外部备用。
 
@@ -203,7 +203,7 @@ getent hosts <device-gateway>
 
 因此系统保持 UTC 也可以。排查日志时要注意：`journalctl` 的显示时间跟随系统时区，页面审计时间使用北京时间。
 
-## 8 部署前网络检查
+## 9. 部署前网络检查
 
 ```bash
 for target in \
@@ -224,9 +224,9 @@ done
 
 截至 2026-08-12，除 SMB `<smb-server>:445` 外，其余依赖均可达。SMB 不可达不影响本地报告生成和下载。
 
-## 9 平台发布包构建
+## 10. 平台发布包构建
 
-### 9.1 Windows 构建机依赖
+### 10.2. Windows 构建机依赖
 
 - Python 3.12 以上；
 - Node.js 20 以上；
@@ -234,7 +234,7 @@ done
 - PowerShell；
 - `tar`。
 
-### 9.2 构建和检查
+### 10.3. 构建和检查
 
 在项目目录执行：
 
@@ -265,9 +265,9 @@ python -m unittest tests.test_firewall_mirror tests.test_platform_api
 
 发布包不会包含密码、运行数据库、报告、临时图片或 `node_modules`。
 
-## 10 平台与巡检服务安装
+## 11. 平台与巡检服务安装
 
-### 10.1 上传并解压
+### 11.2. 上传并解压
 
 ```bash
 scp release/fangyu-jingyao-platform-v<版本>-<时间>.tar.gz \
@@ -283,7 +283,7 @@ tar -xzf /srv/platform-v<版本>-<时间>.tar.gz \
   -C "$release"
 ```
 
-### 10.2 首次启动前准备环境文件
+### 11.3. 首次启动前准备环境文件
 
 首次安装时应在平台第一次启动前填写 `SUPERADMIN_PASSWORD`，避免自动生成随机密码。
 
@@ -302,7 +302,7 @@ editor /etc/inspection.env
 
 如果环境文件已经存在，不要用示例文件覆盖。
 
-### 10.3 平台环境变量
+### 11.4. 平台环境变量
 
 `/etc/platform.env` 推荐内容如下。尖括号内容必须替换，密码保持原文，不能额外加 MD5：
 
@@ -383,7 +383,7 @@ PLATFORM_LOG_LEVEL=INFO
 - `IP_HOSTNAME_STATIC_NETWORKS=<static-office-network>` 表示该网段 PTR 未命中后直接返回未发现，不再查询 DHCP；
 - 两台防火墙使用同一个 API 账号，但使用不同网卡和不同 RESTCONF 数据格式。
 
-### 10.4 巡检环境变量
+### 11.5. 巡检环境变量
 
 `/etc/inspection.env`：
 
@@ -416,7 +416,7 @@ CLEANUP_MAX_AGE_MINUTES=480
 
 SMB 当前不通时可以保留完整配置。系统会明确显示共享不可用，但本地 Word 报告仍会成功生成。
 
-### 10.5 执行安装
+### 11.6. 执行安装
 
 ```bash
 chmod 600 \
@@ -439,7 +439,7 @@ bash "$release/deploy/install-preview.sh" "$release"
 
 不要把运行数据库、报告或上传图片放到 `/opt/platform`，升级时该目录会被发布包同步覆盖。
 
-### 10.6 初次健康检查
+### 11.7. 初次健康检查
 
 ```bash
 systemctl status fangyu-jingyao-platform.service --no-pager
@@ -458,7 +458,7 @@ curl -fsS http://<internal-endpoint>/api/healthz
 
 账号创建完成并修改密码后应删除该文件。已有数据库恢复时通常不会生成该文件。
 
-## 11 企业微信告警机器人部署
+## 12. 企业微信告警机器人部署
 
 机器人程序目前不包含在平台发布包中，必须作为独立组件单独备份和部署。其源目录是：
 
@@ -466,7 +466,7 @@ curl -fsS http://<internal-endpoint>/api/healthz
 /opt/wecom-alarm-bot
 ```
 
-### 11.1 从旧主机导出程序包
+### 12.2. 从旧主机导出程序包
 
 ```bash
 tar \
@@ -491,7 +491,7 @@ sha256sum /srv/wecom-alarm-bot-current.tar.gz
 /etc/systemd/system/wecom-alarm-test-ack.timer
 ```
 
-### 11.2 在新主机安装程序
+### 12.3. 在新主机安装程序
 
 ```bash
 useradd --system \
@@ -522,7 +522,7 @@ install -o wecom-alarm-bot -g wecom-alarm-bot -m 0640 \
 
 全新安装且没有旧审计库时可以跳过，程序首次运行时会创建数据库。
 
-### 11.3 机器人环境变量
+### 12.4. 机器人环境变量
 
 创建 `/etc/wecom-alarm-bot.env`，权限必须为 `600`：
 
@@ -574,7 +574,7 @@ PY
 
 不要把原始 JSON 或生成后的 Base64 写入普通日志。Base64 不是加密，只是配置编码。
 
-### 11.4 systemd 服务
+### 12.5. systemd 服务
 
 `/etc/systemd/system/wecom-alarm-bot.service`：
 
@@ -687,7 +687,7 @@ Unit=wecom-alarm-test-ack.service
 WantedBy=timers.target
 ```
 
-### 11.5 启动机器人
+### 12.6. 启动机器人
 
 ```bash
 chmod 600 /etc/wecom-alarm-bot.env
@@ -717,9 +717,9 @@ curl -fsS http://<internal-endpoint>/api/dashboard
 
 当前自动确认规则：北京时间每天 `10:00:00` 启动，在 `10:00:00–10:10:59` 内每 10 秒读取一次待确认告警；只处理 `process_status=0` 且标题包含“测试”的记录；匹配并确认期望的 2 条告警后停止，否则到窗口结束停止。其他告警不会自动确认。
 
-## 12 Nginx 正式入口
+## 13. Nginx 正式入口
 
-### 12.1 新主机直接启用 80
+### 13.2. 新主机直接启用 80
 
 ```bash
 unlink /etc/nginx/sites-enabled/default 2>/dev/null || true
@@ -733,7 +733,7 @@ systemctl reload nginx
 curl -fsS http://<internal-endpoint>/api/healthz
 ```
 
-### 12.2 替换已有 80 入口
+### 13.3. 替换已有 80 入口
 
 现网沿用了 `/etc/nginx/sites-enabled/inspection` 作为 80 配置文件名。切换时使用项目脚本，它会先备份旧配置：
 
@@ -742,7 +742,7 @@ bash /opt/platform/deploy/switch-root.sh \
   /etc/nginx/sites-enabled/inspection
 ```
 
-### 12.3 预览端口
+### 13.4. 预览端口
 
 8180 仅用于发布观察。如果不再需要：
 
@@ -754,9 +754,9 @@ systemctl reload nginx
 
 正式架构不需要暴露 `18068`、`18080` 或 `18110` 到局域网。
 
-## 13 各外部系统的接入要求
+## 14. 各外部系统的接入要求
 
-### 13.1 Zabbix 大屏告警清除
+### 14.2. Zabbix 大屏告警清除
 
 平台直接连接 MySQL 的 `zabbix.alerts` 表，不再依赖旧 Zabbix Web 服务。
 
@@ -779,7 +779,7 @@ FLUSH PRIVILEGES;
 
 如果 MySQL 实际看到的来源地址不同，应按实际来源调整 Host。部署验收只做查询，除非已有明确可删除的测试告警，不要为了验收删除生产记录。
 
-### 13.2 办公网主机名查询
+### 14.3. 办公网主机名查询
 
 查询顺序：
 
@@ -801,7 +801,7 @@ Get-DhcpServerv4Lease -IPAddress <main-gateway>0
 http://<dhcp-host>:5985/wsman
 ```
 
-### 13.3 办公网封禁恶意域名
+### 14.4. 办公网封禁恶意域名
 
 该模块调用行为管理设备 API，支持从整段文本中识别域名和 IPv4。主要流程：
 
@@ -830,7 +830,7 @@ openssl s_client \
   | sha256sum
 ```
 
-### 13.4 办公网封禁恶意地址
+### 14.5. 办公网封禁恶意地址
 
 两台防火墙必须预先存在：
 
@@ -886,7 +886,7 @@ openssl s_client \
 
 6555E 使用旧 TLS 能力，因此保留 `HFW10_TLS_CIPHERS=ALL:@SECLEVEL=0`。该配置只针对这台内部设备，不应扩展到 Nginx 或其他连接。
 
-### 13.5 巡检 SMB
+### 14.6. 巡检 SMB
 
 共享文件名固定为：
 
@@ -913,9 +913,9 @@ systemctl restart fangyu-jingyao-inspection.service
 journalctl -u fangyu-jingyao-inspection.service -n 100 --no-pager
 ```
 
-## 14 数据目录和数据库
+## 15. 数据目录和数据库
 
-### 14.1 平台数据库
+### 15.2. 平台数据库
 
 ```text
 /var/lib/platform/platform.db
@@ -934,7 +934,7 @@ journalctl -u fangyu-jingyao-inspection.service -n 100 --no-pager
 
 `initial_blacklist.txt` 只用于首次导入，当前标准库的最终权威数据在 `platform.db`。若要精确恢复现网统计，必须恢复数据库，不能只依赖初始文本文件。
 
-### 14.2 巡检数据
+### 15.3. 巡检数据
 
 ```text
 /var/lib/inspection/inspection.db
@@ -951,7 +951,7 @@ tests/fixtures/report-gold/2026-07-30-morning-gold.docx
 tests/fixtures/report-gold/2026-07-30-morning-gold.pdf
 ```
 
-### 14.3 机器人数据
+### 15.4. 机器人数据
 
 ```text
 /var/lib/wecom-alarm-bot/audit.db
@@ -959,7 +959,7 @@ tests/fixtures/report-gold/2026-07-30-morning-gold.pdf
 
 保存机器人状态、自动确认执行结果和最近操作记录，不保存密码。
 
-## 15 用户与认证
+## 16. 用户与认证
 
 - 固定内置账号：`superadmin`；
 - `superadmin` 不能停用或删除；
@@ -973,7 +973,7 @@ tests/fixtures/report-gold/2026-07-30-morning-gold.pdf
 
 若忘记当前 `superadmin` 密码，应通过已登录的超级管理员重置，或执行经过评审的数据库维护流程，不能依赖重新填写 `SUPERADMIN_PASSWORD`。
 
-## 16 完整迁移备份
+## 17. 完整迁移备份
 
 精确迁移至少需要以下内容：
 
@@ -1056,7 +1056,7 @@ find "$backup" -maxdepth 1 -type f ! -name SHA256SUMS \
 
 备份目录含明文环境文件，必须保持 root 专用权限，并进入受控备份系统。上述校验清单只覆盖备份目录第一层的普通文件；`reports/`、`tmp/` 和 `systemd/` 会随整个备份目录一并保存。如需逐文件校验所有子目录，可另行生成递归清单。
 
-## 17 完整恢复顺序
+## 18. 完整恢复顺序
 
 建议顺序：
 
@@ -1116,7 +1116,7 @@ systemctl enable --now \
   fangyu-jingyao-platform.service
 ```
 
-## 18 日常版本更新
+## 19. 日常版本更新
 
 更新前：
 
@@ -1149,9 +1149,9 @@ curl -fsS http://<internal-endpoint>/openapi.json \
 curl -fsS http://<internal-endpoint>/api/healthz
 ```
 
-## 19 回滚
+## 20. 回滚
 
-### 19.1 仅回滚代码
+### 20.2. 仅回滚代码
 
 适用于前端、接口或逻辑问题，数据库结构兼容时：
 
@@ -1160,11 +1160,11 @@ curl -fsS http://<internal-endpoint>/api/healthz
 - 重启服务；
 - 验证 80 和内部健康接口。
 
-### 19.2 回滚数据库
+### 20.3. 回滚数据库
 
 数据库回滚会丢失备份时间之后的用户、审计、巡检配置、报告索引和防火墙镜像变化，只在明确的数据损坏或迁移失败时执行。执行前先为当前数据库再做一次备份。
 
-### 19.3 回滚 Nginx
+### 20.4. 回滚 Nginx
 
 如果通过 `switch-root.sh` 切换过 80：
 
@@ -1174,9 +1174,9 @@ bash /opt/platform/deploy/rollback-root.sh \
   /etc/nginx/sites-enabled/inspection
 ```
 
-## 20 验收清单
+## 21. 验收清单
 
-### 20.1 基础服务
+### 21.2. 基础服务
 
 ```bash
 systemctl is-active nginx
@@ -1192,7 +1192,7 @@ curl -fsS http://<internal-endpoint>/api/dashboard
 curl -fsS http://<internal-endpoint>/api/healthz
 ```
 
-### 20.2 页面验收
+### 21.3. 页面验收
 
 - `superadmin` 可以登录；
 - 普通用户可以登录和修改密码；
@@ -1211,7 +1211,7 @@ curl -fsS http://<internal-endpoint>/api/healthz
 - 机器人、企业微信、告警后台和 Timer 状态正常；
 - 审计日志显示北京时间、用户、来源 IP、动作和结果。
 
-### 20.3 写操作验收
+### 21.4. 写操作验收
 
 以下操作会改变外部系统，只能使用批准的测试对象：
 
@@ -1222,9 +1222,9 @@ curl -fsS http://<internal-endpoint>/api/healthz
 
 不得为了验收随意使用生产公网地址或内网地址。
 
-## 21 常见故障
+## 22. 常见故障
 
-### 21.1 返回 502
+### 22.2. 返回 502
 
 ```bash
 systemctl status fangyu-jingyao-platform.service --no-pager
@@ -1233,7 +1233,7 @@ curl -v http://<internal-endpoint>/api/healthz
 nginx -t
 ```
 
-### 21.2 巡检页面可打开但报告失败
+### 22.3. 巡检页面可打开但报告失败
 
 ```bash
 systemctl status fangyu-jingyao-inspection.service --no-pager
@@ -1243,11 +1243,11 @@ ls -ld /var/lib/inspection/{tmp,reports}
 
 检查数据库和目录是否属于 `fangyu-platform`。
 
-### 21.3 `superadmin` 环境密码无效
+### 22.4. `superadmin` 环境密码无效
 
 `SUPERADMIN_PASSWORD` 只负责首次创建。恢复了旧 `platform.db` 后，登录密码以数据库为准。
 
-### 21.4 DHCP 状态离线
+### 22.5. DHCP 状态离线
 
 检查：
 
@@ -1257,11 +1257,11 @@ ls -ld /var/lib/inspection/{tmp,reports}
 - DHCPServer PowerShell 模块；
 - 账号执行 `Get-DhcpServerv4Scope` 和 `Get-DhcpServerv4Lease` 的权限。
 
-### 21.5 行为管理证书错误
+### 22.6. 行为管理证书错误
 
 证书指纹与 `QAX_CERT_SHA256` 不一致时平台会主动停止请求。重新取得并人工确认新指纹后再更新配置，不要直接关闭指纹校验。
 
-### 21.6 6555E 离线、6625F 正常
+### 22.7. 6555E 离线、6625F 正常
 
 优先检查：
 
@@ -1272,7 +1272,7 @@ timeout 3 bash -c '</dev/tcp/<firewall-a>/8447'
 
 确认源地址是 `<device-source-ip>`，并保留旧 TLS cipher 配置。
 
-### 21.7 防火墙标准库数量变化
+### 22.8. 防火墙标准库数量变化
 
 - 新 IP 由平台封禁或外部同步发现：标准库增加；
 - 测试 IP 封禁后再从两台全部解封：先加一再减一，净变化为零；
@@ -1281,7 +1281,7 @@ timeout 3 bash -c '</dev/tcp/<firewall-a>/8447'
 
 审计日志可用于区分是哪一个用户、什么时间、在哪个来源 IP 执行了操作。
 
-### 21.8 机器人定时任务未运行
+### 22.9. 机器人定时任务未运行
 
 ```bash
 systemctl status wecom-alarm-test-ack.timer --no-pager
@@ -1292,11 +1292,11 @@ journalctl -u wecom-alarm-test-ack.service \
 
 不要只比较服务器 UTC 时钟。Timer 和任务窗口都明确使用 `Asia/Shanghai`。
 
-### 21.9 SMB 不可用
+### 22.10. SMB 不可用
 
 截至本文基线，`<smb-server>:445` 不可达。平台应继续正常生成本地报告。不要通过修改默认路由破坏其他 25 网段业务来强行测试 SMB。
 
-## 22 日志位置
+## 23. 日志位置
 
 | 内容 | 命令或位置 |
 | --- | --- |
@@ -1310,7 +1310,7 @@ journalctl -u wecom-alarm-test-ack.service \
 
 环境文件中的密码、Token、Secret 不应出现在日志、截图或普通运维文档中。
 
-## 23 后续模块接入
+## 24. 后续模块接入
 
 新增业务模块优先采用：
 
@@ -1330,7 +1330,7 @@ docs/MODULE-INTEGRATION.md
 
 业务数据库默认保持独立。平台只负责统一登录、代理、状态、展示和审计，不要求为了接入而合并数据库。
 
-## 24 现网 2.8.4 基线
+## 25. 现网 2.8.4 基线
 
 截至 2026-08-14：
 
@@ -1352,7 +1352,7 @@ pre-current-release-backup
 pre-previous-release-backup
 ```
 
-## 25 凭据准备清单
+## 26. 凭据准备清单
 
 完整重装前必须准备：
 

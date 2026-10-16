@@ -15,7 +15,7 @@ tags = [
 
 ---
 
-## 1 结论速览
+## 2. 结论速览
 
 这台机器的 dsh 部署包含多项源码改造:
 
@@ -25,7 +25,7 @@ tags = [
 
 ---
 
-## 2 背景与目标
+## 3. 背景与目标
 
 | 项 | 值 |
 |---|---|
@@ -42,9 +42,9 @@ dsh 这版以「本机(loopback)」作为安全前提，监听地址、令牌签
 
 ---
 
-## 3 环境准备
+## 4. 环境准备
 
-### 3.1 Node.js —— 系统源版本过旧
+### 4.2. Node.js —— 系统源版本过旧
 
 麒麟系统源里的 Node.js 只有 `12.x`,而 dsh 的 `package.json` 明确要求:
 
@@ -70,13 +70,13 @@ EOF
 node -v   # v22.23.3
 ```
 
-### 3.2 出网问题
+### 4.3. 出网问题
 
 该机器需要出网才能下载 Node 与 npm 包,相关网络方案不在此处展开。后续 dsh 服务同样可能通过 `HTTP_PROXY/HTTPS_PROXY` 出网,而这一点会在 §6.4 引出一个大坑。
 
 ---
 
-## 4 安装 dsh
+## 5. 安装 dsh
 
 ```bash
 npm i -g @deepseek-ai/dsh
@@ -87,27 +87,27 @@ npm i -g @deepseek-ai/dsh
 
 ---
 
-## 5 改造一:让 dsh 监听 LAN IP
+## 6. 改造一:让 dsh 监听 LAN IP
 
-### 5.1 现象
+### 6.2. 现象
 
 ```bash
 dsh web --host <HOST_IP> --port 80
 # 启动被 host 校验拒绝
 ```
 
-### 5.2 根因
+### 6.3. 根因
 
 dsh 的 host 校验器(`@deepseek-ai/dsh-host-webserver`)在 schema 层把允许的 host 限制为 loopback 集合,`<HOST_IP>` 不在其中,启动即被拒。
 
-### 5.3 定位
+### 6.4. 定位
 
 ```bash
 cd <NODE_GLOBAL_MODULES>/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-host-webserver/lib
 # 打开 index.js,定位到被校验的 host 枚举(第 142 行附近)
 ```
 
-### 5.4 修复(补丁 1)
+### 6.5. 修复(补丁 1)
 
 - 文件:`@deepseek-ai/dsh-host-webserver/lib/index.js:142`
 - 改动:把 `<HOST_IP>` 加入允许的 host 列表
@@ -115,14 +115,14 @@ cd <NODE_GLOBAL_MODULES>/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-host-web
 
 ---
 
-## 6 改造二:固定访问令牌
+## 7. 改造二:固定访问令牌
 
-### 6.1 现象
+### 7.2. 现象
 
 - 浏览器访问不带 token → `401`;
 - 服务重启后,原来带 token 的链接全部失效(令牌每次随机)。
 
-### 6.2 根因
+### 7.3. 根因
 
 `@deepseek-ai/dsh-client-connection` 启动时调用 `processLaunchToken` 生成一个**随机** launch token,并在日志里打印形如:
 
@@ -130,21 +130,21 @@ cd <NODE_GLOBAL_MODULES>/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-host-web
 dsh web: http://127.0.0.1/?token=<random>
 ```
 
-### 6.3 修复(补丁 2)
+### 7.4. 修复(补丁 2)
 
 - 文件:`@deepseek-ai/dsh-client-connection/lib/index.js`
 - 改动:`processLaunchToken` 直接返回固定字符串 `"<REDACTED_TOKEN>"`
 - 备份:`cp -n index.js index.js.bak`
 
-### 6.4 效果
+### 7.5. 效果
 
 访问地址固定为 http://<HOST_IP>/?token=<REDACTED_TOKEN>,首次访问返回 303 并下发 cookie,后续 cookie 有效期约 30 天。
 
 ---
 
-## 7 修复 dsh 功能
+## 8. 修复 dsh 功能
 
-### 7.1 现象:客户端判定为非本机 → 设置能力被关闭
+### 8.2. 现象:客户端判定为非本机 → 设置能力被关闭
 
 LAN 打开页面后,设置面板报:
 
@@ -152,14 +152,14 @@ LAN 打开页面后,设置面板报:
 settings are unavailable in this browser
 ```
 
-### 7.2 根因
+### 8.3. 根因
 
 客户端(`dsh-client-connection`)有一段 loopback 判定,并把「是否本机」的结果分发给设置模块。客户端判定为非 loopback 时:
 
 - 设置的持久化模式被降级(不是 `host`);
 - 设置文档存储(`SettingsDocumentStore`)被跳过,导致「设置不可用」。
 
-### 7.3 修复(补丁 3 / 4 / 5)
+### 8.4. 修复(补丁 3 / 4 / 5)
 
 | 补丁 | 文件:行 | 改动 | 作用 |
 |---|---|---|---|
@@ -174,7 +174,7 @@ cp -n dsh-client-ui-settings/lib/client.js         dsh-client-ui-settings/lib/cl
 cp -n dsh-client-ui-settings-general/lib/client.js dsh-client-ui-settings-general/lib/client.js.bak
 ```
 
-### 7.4 坑:`/api/*` 返回 403,以及 `NO_PROXY` 不支持 CIDR 导致的 503
+### 8.5. 坑:`/api/*` 返回 403,以及 `NO_PROXY` 不支持 CIDR 导致的 503
 
 **(a) 403 —— 非可信来源**
 
@@ -225,7 +225,7 @@ NO_PROXY=localhost,127.0.0.1,<HOST_IP>,<MODEL_SERVER_IP>
 
 ---
 
-## 8 服务化与防火墙
+## 9. 服务化与防火墙
 
 `<SYSTEMD_UNIT_PATH>`:
 
@@ -281,9 +281,9 @@ firewall-cmd --reload
 
 ---
 
-## 9 接入本地模型(pi-ai)
+## 10. 接入本地模型(pi-ai)
 
-### 9.1 本地端点
+### 10.2. 本地端点
 
 先探测模型服务器(`/v1/models`)拿到真实信息:
 
@@ -305,7 +305,7 @@ firewall-cmd --reload
 
 用 `curl` 直接验证过:非流式返回 `200`,流式 SSE 正常(该模型会先输出 `reasoning_content` 增量)。
 
-### 9.2 确认适配器已挂载
+### 10.3. 确认适配器已挂载
 
 dsh 里负责 OpenAI 兼容接入的是 `@deepseek-ai/dsh-llm-pi-ai`。先确认它随 `web` profile 挂载(处于「已挂载但未配置」的空闲态):
 
@@ -315,7 +315,7 @@ dsh --profile web --dump-config | grep -A2 -i "pi-ai"
 #   name: '@deepseek-ai/dsh-llm-pi-ai'
 ```
 
-### 9.3 通过 profile 补丁层声明路由
+### 10.4. 通过 profile 补丁层声明路由
 
 **补丁层文件为** `<DSH_HOME>/profiles/web/cordis.patch.yml`(它在所有 bundle 层之后应用):
 
@@ -346,7 +346,7 @@ dsh --profile web --dump-config | grep -A2 -i "pi-ai"
 dsh --profile web --dump-config | grep -A15 "id: llm-pi-ai"
 ```
 
-### 9.4 注入凭据
+### 10.5. 注入凭据
 
 `apiKeyEnv: LOCAL_QWEN_KEY` 是一个**凭据引用**,必须能解析出真实值,否则请求会以 `MISSING_CREDENTIAL` 失败。凭据解析顺序:环境变量 → `~/.dsh/.credentials.yaml` → `~/.dsh/.env`。这里两者都写好:
 
@@ -362,11 +362,11 @@ systemctl restart dsh-web
 
 ---
 
-## 10 端到端验证(含 RPC 调试方法)
+## 11. 端到端验证(含 RPC 调试方法)
 
 页面打开后,再运行一轮模型测试,确认从 Web 界面到本地模型的调用链路。dsh Web 的前后端通过一个桥接端点 `/api/<namespace>/<method>` 通信,RPC 请求结构如下。
 
-### 10.1 请求信封
+### 11.2. 请求信封
 
 ```jsonc
 {
@@ -384,7 +384,7 @@ systemctl restart dsh-web
   `typert gateway: <method>: args fields do not match the descriptor: missing "x", unexpected "y"`
   (可以借助这个报错**迭代发现**所需字段)。
 
-### 10.2 验证 provider 与目录
+### 11.3. 验证 provider 与目录
 
 ```bash
 curl -s -b cookie.txt -X POST "http://<HOST_IP>/api/llm/listProviders" \
@@ -408,7 +408,7 @@ curl -s -b cookie.txt -X POST "http://<HOST_IP>/api/session/modelCatalog" \
             "models":[{"id":"qwen-local","name":"Qwen3.8-27B Uncensored"}]}]}
 ```
 
-### 10.3 坑:会话默认模型是 DeepSeek,不是本地模型
+### 11.4. 坑:会话默认模型是 DeepSeek,不是本地模型
 
 第一次调用 `session/create` 时，即使在 `request.model` 中指定模型且接口返回 `ok`，会话仍使用默认的 `deepseek-official`(无 key):
 
@@ -449,7 +449,7 @@ remote.session.prompt({
 }, signal)
 ```
 
-### 10.4 最终证据
+### 11.5. 最终证据
 
 读取 `session/list`(`args` 需为 `{"_request":{}}`):
 
@@ -465,7 +465,7 @@ remote.session.prompt({
 
 ---
 
-## 11 故障复盘表
+## 12. 故障复盘表
 
 | # | 现象 / 报错原文 | 根因 | 定位手段 | 修复 |
 |---|---|---|---|---|
@@ -480,7 +480,7 @@ remote.session.prompt({
 
 ---
 
-## 12 回归 / 排错小抄
+## 13. 回归 / 排错小抄
 
 - **看组合后的配置**:`dsh --profile web --dump-config`
 - **看服务日志**:`journalctl -u dsh-web --no-pager -n 50`
@@ -493,7 +493,7 @@ remote.session.prompt({
 
 ---
 
-## 13 回滚
+## 14. 回滚
 
 - 每个被改文件都留了 `.bak`(如 `index.js.bak`),`cp` 回去即可;
 - profile 配置改的是补丁层 `cordis.patch.yml`(备份为 `cordis.patch.yml.bak`),删掉 `llm-pi-ai` 段即可移除本地模型;
@@ -501,7 +501,7 @@ remote.session.prompt({
 
 ---
 
-## 14 关键文件清单
+## 15. 关键文件清单
 
 | 路径 | 说明 |
 |---|---|
@@ -518,7 +518,7 @@ remote.session.prompt({
 
 ---
 
-## 15 日常使用与后续可选项
+## 16. 日常使用与后续可选项
 
 - 访问:http://<HOST_IP>/?token=<REDACTED_TOKEN>(cookie 约 30 天)
 - 选本地模型:模型选择器 → `Qwen Local (llama.cpp)` → `Qwen3.8-27B Uncensored`

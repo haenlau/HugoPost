@@ -8,8 +8,8 @@ aliases = ["/posts/ocserv-install-config/"]
 categories = ["笔记"]
 draft = false
 +++
-## 1 CentOS 7 安装配置
-### 1.1 安装 EPEL 源和 Ocserv
+## 2. CentOS 7 安装配置
+### 2.2. 安装 EPEL 源和 Ocserv
 ```bash
 # 安装 EPEL 源
 yum -y install epel-release
@@ -17,7 +17,7 @@ yum -y install epel-release
 yum -y install ocserv
 ```
 
-### 1.2 生成 SSL 证书
+### 2.3. 生成 SSL 证书
 ```bash
 # 创建证书存放目录并进入
 mkdir ssl && cd ssl
@@ -58,7 +58,7 @@ cp server-key.pem /etc/pki/ocserv/private/
 cp ca-cert.pem /etc/pki/ocserv/cacerts/
 ```
 
-### 1.3 配置 Ocserv 主配置文件
+### 2.4. 配置 Ocserv 主配置文件
 编辑配置文件：
 ```bash
 vi /etc/ocserv/ocserv.conf
@@ -97,7 +97,7 @@ dns = 8.8.8.8
 dns = 8.8.4.4
 ```
 
-### 1.4 创建/管理 VPN 用户
+### 2.5. 创建/管理 VPN 用户
 ```bash
 # 创建用户（将 air1 替换为你要使用的用户名）
 ocpasswd -c /etc/ocserv/ocpasswd air1
@@ -105,7 +105,7 @@ ocpasswd -c /etc/ocserv/ocpasswd air1
 ocpasswd -c /etc/ocserv/ocpasswd -d air1
 ```
 
-### 1.5 系统网络配置
+### 2.6. 系统网络配置
 ```bash
 # 启用 IPv4 转发
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -124,7 +124,7 @@ firewall-cmd --permanent --direct --passthrough ipv4 -t nat -A POSTROUTING -o et
 firewall-cmd --reload
 ```
 
-### 1.6 启动并设置开机自启
+### 2.7. 启动并设置开机自启
 ```bash
 # 测试运行（前台模式，可查看日志）
 ocserv -f -d 1
@@ -136,8 +136,8 @@ systemctl start ocserv
 systemctl restart ocserv
 ```
 
-## 2 Ubuntu 安装配置
-### 2.1 安装 Ocserv
+## 3. Ubuntu 安装配置
+### 3.2. 安装 Ocserv
 ```bash
 # 更新软件源
 apt update
@@ -145,7 +145,7 @@ apt update
 apt install -y ocserv gnutls-bin
 ```
 
-### 2.2 生成 SSL 证书（与 CentOS 步骤一致）
+### 3.3. 生成 SSL 证书（与 CentOS 步骤一致）
 ```bash
 # 创建证书目录
 mkdir ssl && cd ssl
@@ -187,7 +187,7 @@ cp server-key.pem /etc/ocserv/certs/
 cp ca-cert.pem /etc/ocserv/certs/
 ```
 
-### 2.3 配置 Ocserv 主配置文件
+### 3.4. 配置 Ocserv 主配置文件
 Ubuntu 下配置文件路径为 `/etc/ocserv/ocserv.conf`，编辑配置：
 ```bash
 vi /etc/ocserv/ocserv.conf
@@ -218,12 +218,12 @@ dns = 8.8.8.8
 dns = 8.8.4.4
 ```
 
-### 2.4 创建 VPN 用户（同 CentOS）
+### 3.5. 创建 VPN 用户（同 CentOS）
 ```bash
 ocpasswd -c /etc/ocserv/ocpasswd air1
 ```
 
-### 2.5 系统网络配置
+### 3.6. 系统网络配置
 ```bash
 # 启用 IPv4 转发
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -241,7 +241,7 @@ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 iptables-save > /etc/iptables/rules.v4
 ```
 
-### 2.6 启动并设置开机自启
+### 3.7. 启动并设置开机自启
 ```bash
 # 测试运行
 ocserv -f -d 1
@@ -252,7 +252,7 @@ systemctl start ocserv
 systemctl restart ocserv
 ```
 
-## 3 常见问题
+## 4. 常见问题
 
 | 问题 | 处理建议 |
 |------|----------|
@@ -260,7 +260,7 @@ systemctl restart ocserv
 | 网卡名称不一致 | Ubuntu / CentOS 的网卡名称可能为 `ens33`、`eth0` 等，先用 `ip addr` 确认实际网卡名。 |
 | 证书生成失败 | 确保已安装 `gnutls-bin`（Ubuntu）或 `gnutls-utils`（CentOS）。 |
 
-### 3.1 总结
+### 4.2. 总结
 1. **CentOS** 依赖 EPEL 源安装 Ocserv，证书默认存放路径为 `/etc/pki/ocserv/`，防火墙使用 firewalld；
 2. **Ubuntu** 直接通过 apt 安装，证书需手动创建目录 `/etc/ocserv/certs/`，防火墙默认使用 UFW，需配置 iptables 实现 NAT 转发；
 3. 核心配置项（认证方式、端口、DNS、证书路径）在两个系统中基本一致，仅需适配证书存放路径和防火墙命令。

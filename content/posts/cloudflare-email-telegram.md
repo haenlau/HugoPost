@@ -11,7 +11,7 @@ tags = [
 
 Cloudflare Email Routing 可以把域名邮箱转发到真实邮箱，但如果只依赖邮箱客户端通知，容易错过新邮件。更直接的做法，是让 Cloudflare Email Worker 在收到邮件后，同时向 Telegram 发送摘要，并把完整邮件转发到目标邮箱。
 
-## 1 工作流程
+## 2. 工作流程
 
 ```text
 域名邮箱
@@ -23,7 +23,7 @@ Cloudflare Email Worker
 
 Telegram 只负责即时提醒，完整邮件仍然保存到真实邮箱。这样可以避免把验证码、账单、附件和私人正文直接发送到 Telegram。
 
-## 2 最终 Worker 代码
+## 3. 最终 Worker 代码
 
 邮件主题经常使用 MIME Header 编码，中文主题可能表现为下面这样的形式：
 
@@ -135,7 +135,7 @@ function decodeMimeHeader(header) {
 }
 ```
 
-## 3 Cloudflare Worker 配置
+## 4. Cloudflare Worker 配置
 
 代码使用 3 个绑定：
 
@@ -147,7 +147,7 @@ function decodeMimeHeader(header) {
 
 `TG_BOT_TOKEN` 不要写进源码或公开仓库。建议在 Cloudflare 控制台的 Worker Settings 中使用 Secret 配置。
 
-## 4 配置 Email Routing
+## 5. 配置 Email Routing
 
 在 Cloudflare Email Routing 中，把域名邮箱的规则指向这个 Worker：
 
@@ -165,7 +165,7 @@ await message.forward(env.FORWARD_TO);
 
 不要同时保留一条绕过 Worker 的直接转发规则，否则可能出现邮件已经到达真实邮箱，但 Telegram 没有通知的情况。
 
-## 5 为什么使用 HTML 模式
+## 6. 为什么使用 HTML 模式
 
 Telegram 的 `MarkdownV2` 需要转义很多字符：
 
@@ -193,7 +193,7 @@ parse_mode: "HTML"
 
 这样可以降低中文主题出现乱码或格式错误的概率。
 
-## 6 为什么要解码 MIME Header
+## 7. 为什么要解码 MIME Header
 
 邮件主题不是简单的 UTF-8 文本。邮件客户端和服务器为了兼容不同字符集，会把非 ASCII 字符编码成 MIME Header，例如：
 
@@ -209,7 +209,7 @@ parse_mode: "HTML"
 
 如果不解码，Telegram 里看到的可能就是一串编码文本，而不是正常中文主题。`decodeMimeHeader()` 会识别这些片段，并使用 `TextDecoder` 按对应字符集还原文本。
 
-## 7 测试步骤
+## 8. 测试步骤
 
 1. 从外部邮箱发送一封测试邮件；
 2. 主题使用中文和特殊符号，例如：
@@ -221,9 +221,9 @@ parse_mode: "HTML"
 5. 检查 Worker Logs；
 6. 临时测试错误 Telegram Token 时，确认邮件仍然可以正常转发。
 
-## 8 常见问题
+## 9. 常见问题
 
-### 8.1 Telegram 收不到，但邮箱能收到
+### 9.2. Telegram 收不到，但邮箱能收到
 
 检查：
 
@@ -233,11 +233,11 @@ parse_mode: "HTML"
 - Bot 是否被拉黑；
 - Worker 日志中 Telegram API 的返回状态。
 
-### 8.2 中文主题仍然显示异常
+### 9.3. 中文主题仍然显示异常
 
 检查邮件原始主题是否使用了不常见字符集。如果 `TextDecoder` 不支持邮件声明的字符集，函数会返回编码片段本身。常见的 `UTF-8`、`GBK` 和 `GB2312` 通常可以正常处理。
 
-### 8.3 Telegram 失败会不会导致邮件丢失
+### 9.4. Telegram 失败会不会导致邮件丢失
 
 代码先单独捕获 Telegram 请求异常，然后继续执行：
 
@@ -247,7 +247,7 @@ await message.forward(env.FORWARD_TO);
 
 因此 Telegram 推送失败时，邮件仍然会继续转发。实际部署时仍应检查 Worker 日志和目标邮箱的收件情况。
 
-### 8.4 收到重复邮件
+### 9.5. 收到重复邮件
 
 检查 Email Routing 中是否同时配置了：
 
@@ -256,7 +256,7 @@ await message.forward(env.FORWARD_TO);
 
 推荐只保留 Worker 路径，由 Worker 统一完成 Telegram 通知和邮件转发。
 
-## 9 安全注意事项
+## 10. 安全注意事项
 
 - `TG_BOT_TOKEN` 只存储为 Cloudflare Secret；
 - 不要把完整邮件正文发送到 Telegram；

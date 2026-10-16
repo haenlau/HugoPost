@@ -8,7 +8,7 @@ aliases = ["/posts/inspection-system-architecture/"]
 categories = ["运维"]
 draft = false
 +++
-## 1 系统概述
+## 2. 系统概述
 
 为生产机房值班监控开发的 B/S 架构巡检系统。核心流程：前端采集 20 个巡检点数据 → 图片压缩 → 生成 Word 报告 → 上传 SMB 共享目录归档。
 
@@ -24,7 +24,7 @@ draft = false
 | 远程传输 | smbprotocol |
 | 部署 | Nginx + Systemd |
 
-## 2 服务器配置
+## 3. 服务器配置
 
 | 项目 | 值 |
 |------|-----|
@@ -53,7 +53,7 @@ SMB 共享配置：
 | 用户名 | `YOUR_DOMAIN\YOUR_USER` |
 | 密码 | `YOUR_PASSWORD` |
 
-## 3 目录结构
+## 4. 目录结构
 
 ```text
 /opt/inspection/
@@ -90,7 +90,7 @@ SMB 共享配置：
 └── deploy.sh
 ```
 
-## 4 巡检点清单（20 个）
+## 5. 巡检点清单（20 个）
 
 | 序号 | 巡检点名称 | 类型 | 基线范围 |
 |------|-----------|------|----------|
@@ -131,7 +131,7 @@ SMB 共享配置：
 | 温湿度异常（超出基线） | 整行黄底 |
 | CNC 数量 > 0 | 数值红字 + 二次确认弹窗 |
 
-## 5 API 接口
+## 6. API 接口
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
@@ -143,7 +143,7 @@ SMB 共享配置：
 | GET | `/api/report/{record_id}` | 下载报告 |
 | GET | `/api/inspection/records` | 获取巡检记录列表 |
 
-### 5.1 提交巡检请求体示例
+### 6.2. 提交巡检请求体示例
 
 ```json
 {
@@ -172,9 +172,9 @@ SMB 共享配置：
 | `smb_path` | 支持完整 UNC 路径或相对路径 |
 | `skip_smb` | 为 `true` 时只生成报告，不上传 SMB |
 
-## 6 服务管理
+## 7. 服务管理
 
-### 6.1 状态检查
+### 7.2. 状态检查
 
 ```bash
 systemctl status inspection
@@ -182,7 +182,7 @@ systemctl status nginx
 systemctl is-enabled inspection
 ```
 
-### 6.2 启停操作
+### 7.3. 启停操作
 
 ```bash
 systemctl restart inspection
@@ -190,7 +190,7 @@ systemctl stop inspection
 systemctl start inspection
 ```
 
-### 6.3 日志查看
+### 7.4. 日志查看
 
 ```bash
 journalctl -u inspection -f
@@ -198,7 +198,7 @@ journalctl -u inspection -n 100
 tail -f /var/log/nginx/access.log
 ```
 
-### 6.4 Systemd 服务配置
+### 7.5. Systemd 服务配置
 
 ```ini
 [Unit]
@@ -217,22 +217,22 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-## 7 数据备份与恢复
+## 8. 数据备份与恢复
 
-### 7.1 备份数据库
+### 8.2. 备份数据库
 
 ```bash
 cp /opt/inspection/backend/data/inspection.db \
   /opt/inspection/backend/data/inspection_$(date +%Y%m%d).db
 ```
 
-### 7.2 备份报告
+### 8.3. 备份报告
 
 ```bash
 tar -czf /tmp/reports_$(date +%Y%m%d).tar.gz /opt/inspection/backend/reports/
 ```
 
-### 7.3 恢复数据库
+### 8.4. 恢复数据库
 
 ```bash
 systemctl stop inspection
@@ -240,7 +240,7 @@ cp /opt/inspection/backend/data/inspection.db.bak /opt/inspection/backend/data/i
 systemctl start inspection
 ```
 
-## 8 常见问题排查
+## 9. 常见问题排查
 
 **服务无法启动：**
 
@@ -279,23 +279,23 @@ ls -la /opt/inspection/frontend/dist/ # 检查构建产物
 cd /opt/inspection/frontend && npm run build
 ```
 
-## 9 部署流程
+## 10. 部署流程
 
-### 9.1 后端更新
+### 10.2. 后端更新
 
 ```bash
 scp -r ./backend/* root@YOUR_SERVER_IP:/opt/inspection/backend/
 ssh root@YOUR_SERVER_IP "systemctl restart inspection"
 ```
 
-### 9.2 前端更新
+### 10.3. 前端更新
 
 ```bash
 scp -r ./frontend/* root@YOUR_SERVER_IP:/opt/inspection/frontend/
 ssh root@YOUR_SERVER_IP "cd /opt/inspection/frontend && npm run build"
 ```
 
-### 9.3 一键部署脚本
+### 10.4. 一键部署脚本
 
 ```bash
 #!/bin/bash
@@ -320,7 +320,7 @@ ssh $USER@$SERVER "systemctl status inspection --no-pager | head -5"
 echo "=== 部署完成 ==="
 ```
 
-## 10 巡检点配置修改
+## 11. 巡检点配置修改
 
 添加新巡检点需要同步修改三个文件：
 
@@ -339,7 +339,7 @@ systemctl restart inspection
 
 修改基线范围或字段名称：只需改 `schemas.py` 和 `definitions.js` 中对应字段的 `standard` 或 `label` 值。
 
-## 11 Python 依赖
+## 12. Python 依赖
 
 | 依赖 | 版本 | 用途 |
 |------|------|------|
@@ -354,7 +354,7 @@ systemctl restart inspection
 | pydantic-settings | latest | 配置管理 |
 | apscheduler | latest | 定时任务
 
-## 12 前端依赖
+## 13. 前端依赖
 
 | 依赖 | 版本 |
 |------|------|
