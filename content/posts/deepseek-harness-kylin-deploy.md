@@ -9,23 +9,19 @@ tags = [
 ]
 +++
 
-# DeepSeek Harness 在麒麟系统部署与深度改造记
-
 > 目标平台:Kylin Linux Advanced Server V10 (Halberd) / aarch64 / 鲲鹏 920
-> 目标地址:http://HOST_IP/?token=REDACTED_TOKEN
+> 目标地址:http://<HOST_IP>/?token=<REDACTED_TOKEN>
 > 记录范围:安装、坑点排查与根因分析、dsh 功能修复(补丁)、本地模型接入、端到端验证。
 
 ---
 
 ## 0. 结论速览
 
-这台机器上做的不是「装完就能用」的常规部署,而是一次改造:
+这台机器的 dsh 部署包含多项源码改造:
 
 - dsh `0.2.0-rc.2` **原生只监听 loopback、每次启动随机生成访问令牌、对非本机来源关闭设置能力**;
 - 为了做到「绑定 LAN IP + 固定令牌 + 设置面板可用 + 接入局域网里的本地大模型」,一共需要 **5 处源码补丁**、1 个启动参数、1 处 profile 配置;
 - 另外踩了一个非常隐蔽的坑:**Node 的 `NO_PROXY` 不认 CIDR**,导致 dsh 访问同网段的模型服务器时被错误地送进代理,报 `503`。
-
-下面按「安装 → 改造 → 修复 → 接入模型 → 验证」的顺序,把每一步的现象、根因、定位手段、修复都写清楚。
 
 ---
 
@@ -35,14 +31,14 @@ tags = [
 |---|---|
 | 操作系统 | Kylin Linux Advanced Server V10 (Halberd),aarch64 |
 | 硬件 | 鲲鹏 920,64 核,509GB 内存,364GB 磁盘,**无 GPU** |
-| 主机 IP | `HOST_IP` |
-| 目标 1 | dsh Web 绑定 LAN IP(`HOST_IP`),而非 `127.0.0.1` |
-| 目标 2 | 固定访问令牌 `REDACTED_TOKEN`,重启不变 |
+| 主机 IP | `<HOST_IP>` |
+| 目标 1 | dsh Web 绑定 LAN IP(`<HOST_IP>`),而非 `127.0.0.1` |
+| 目标 2 | 固定访问令牌 `<REDACTED_TOKEN>`,重启不变 |
 | 目标 3 | 设置面板(App Settings)在该浏览器可用 |
-| 目标 4 | 接入局域网 `MODEL_SERVER_IP:8080` 上的本地模型 |
+| 目标 4 | 接入局域网 `<MODEL_SERVER_IP>:8080` 上的本地模型 |
 | 目标 5 | systemd 托管,开机自启 |
 
-**为什么需要改造而不是纯配置**:dsh 这版把「本机(loopback)」当作安全前提来设计——监听地址、令牌签发、设置能力都由「是否 loopback」直接决定。一旦要求 LAN 访问,这三条全部失效,只能打补丁。这也是后文所有坑的源头。
+dsh 这版以「本机(loopback)」作为安全前提，监听地址、令牌签发和设置能力均由 loopback 判定决定。启用 LAN 访问后，这些限制需要通过补丁调整。
 
 ---
 
@@ -60,23 +56,23 @@ engines.node = ^22.19.0 || >=24.0.0
 
 ```bash
 tar -xJf node-v22.23.3-linux-arm64.tar.xz -C /opt
-mv <NODE_ARCHIVE_DIR> /REDACTED/NODE_PREFIX
+mv <NODE_ARCHIVE_DIR> <NODE_PREFIX>
 
-ln -sf /REDACTED/NODE_PREFIX/bin/node     /usr/local/bin/node
-ln -sf /REDACTED/NODE_PREFIX/bin/npm      /usr/local/bin/npm
-ln -sf /REDACTED/NODE_PREFIX/bin/npx      /usr/local/bin/npx
-ln -sf /REDACTED/NODE_PREFIX/bin/corepack /usr/local/bin/corepack
+ln -sf <NODE_PREFIX>/bin/node     /usr/local/bin/node
+ln -sf <NODE_PREFIX>/bin/npm      /usr/local/bin/npm
+ln -sf <NODE_PREFIX>/bin/npx      /usr/local/bin/npx
+ln -sf <NODE_PREFIX>/bin/corepack /usr/local/bin/corepack
 
-cat > /etc/profile.d/node.sh <<'EOF'
-export PATH=/REDACTED/NODE_PREFIX/bin:$PATH
+cat > /etc/profile.d/node.sh <'EOF'
+export PATH=<NODE_PREFIX>/bin:$PATH
 EOF
 
 node -v   # v22.23.3
 ```
 
-### 2.2 出网问题(本文不展开)
+### 2.2 出网问题
 
-该机器需要出网才能下载 Node 与 npm 包,相关网络方案不在本文范围,仅需知道:后续 dsh 服务同样可能通过 `HTTP_PROXY/HTTPS_PROXY` 出网,而这一点会在 §6.4 引出一个大坑。
+该机器需要出网才能下载 Node 与 npm 包,相关网络方案不在此处展开。后续 dsh 服务同样可能通过 `HTTP_PROXY/HTTPS_PROXY` 出网,而这一点会在 §6.4 引出一个大坑。
 
 ---
 
@@ -87,7 +83,7 @@ npm i -g @deepseek-ai/dsh
 ```
 
 - 安装版本:`0.2.0-rc.2`(最新稳定版;当时 alpha 已到 `0.2.1-alpha.4`,未采用)
-- 可执行文件:`/REDACTED/NODE_PREFIX/bin/dsh` → 软链 `/usr/local/bin/dsh`
+- 可执行文件:`<NODE_PREFIX>/bin/dsh` → 软链 `/usr/local/bin/dsh`
 
 ---
 
@@ -96,25 +92,25 @@ npm i -g @deepseek-ai/dsh
 ### 4.1 现象
 
 ```bash
-dsh web --host HOST_IP --port 80
+dsh web --host <HOST_IP> --port 80
 # 启动被 host 校验拒绝
 ```
 
 ### 4.2 根因
 
-dsh 的 host 校验器(`@deepseek-ai/dsh-host-webserver`)在 schema 层把允许的 host 限制为 loopback 集合,`HOST_IP` 不在其中,启动即被拒。
+dsh 的 host 校验器(`@deepseek-ai/dsh-host-webserver`)在 schema 层把允许的 host 限制为 loopback 集合,`<HOST_IP>` 不在其中,启动即被拒。
 
 ### 4.3 定位
 
 ```bash
-cd /REDACTED/NODE_GLOBAL_MODULES/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-host-webserver/lib
+cd <NODE_GLOBAL_MODULES>/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-host-webserver/lib
 # 打开 index.js,定位到被校验的 host 枚举(第 142 行附近)
 ```
 
 ### 4.4 修复(补丁 1)
 
 - 文件:`@deepseek-ai/dsh-host-webserver/lib/index.js:142`
-- 改动:把 `HOST_IP` 加入允许的 host 列表
+- 改动:把 `<HOST_IP>` 加入允许的 host 列表
 - 备份:`cp -n index.js index.js.bak`
 
 ---
@@ -137,12 +133,12 @@ dsh web: http://127.0.0.1/?token=<random>
 ### 5.3 修复(补丁 2)
 
 - 文件:`@deepseek-ai/dsh-client-connection/lib/index.js`
-- 改动:`processLaunchToken` 直接返回固定字符串 `"REDACTED_TOKEN"`
+- 改动:`processLaunchToken` 直接返回固定字符串 `"<REDACTED_TOKEN>"`
 - 备份:`cp -n index.js index.js.bak`
 
 ### 5.4 效果
 
-访问地址固定为 http://HOST_IP/?token=REDACTED_TOKEN,首次访问返回 303 并下发 cookie,后续 cookie 有效期约 30 天。
+访问地址固定为 http://<HOST_IP>/?token=<REDACTED_TOKEN>,首次访问返回 303 并下发 cookie,后续 cookie 有效期约 30 天。
 
 ---
 
@@ -158,7 +154,7 @@ settings are unavailable in this browser
 
 ### 6.2 根因
 
-客户端(`dsh-client-connection`)有一段 loopback 判定,并把「是否本机」的结果分发给设置模块。非 loopback 时:
+客户端(`dsh-client-connection`)有一段 loopback 判定,并把「是否本机」的结果分发给设置模块。客户端判定为非 loopback 时:
 
 - 设置的持久化模式被降级(不是 `host`);
 - 设置文档存储(`SettingsDocumentStore`)被跳过,导致「设置不可用」。
@@ -172,7 +168,7 @@ settings are unavailable in this browser
 | 5 | `dsh-client-ui-settings-general/lib/client.js:992` | 无条件 `new SettingsDocumentStore(ctx, ctx.configForms.describe())` | 强制创建设置文档存储 |
 
 ```bash
-cd /REDACTED/NODE_GLOBAL_MODULES/@deepseek-ai/dsh/node_modules/@deepseek-ai
+cd <NODE_GLOBAL_MODULES>/@deepseek-ai/dsh/node_modules/@deepseek-ai
 cp -n dsh-client-connection/lib/client.js          dsh-client-connection/lib/client.js.bak
 cp -n dsh-client-ui-settings/lib/client.js         dsh-client-ui-settings/lib/client.js.bak
 cp -n dsh-client-ui-settings-general/lib/client.js dsh-client-ui-settings-general/lib/client.js.bak
@@ -185,7 +181,7 @@ cp -n dsh-client-ui-settings-general/lib/client.js dsh-client-ui-settings-genera
 改造后页面能开,但所有 `/api/*` 请求 `HTTP 403`。原因是 host 校验通过后,还有一层「可信来源(trusted host)」校验。解决方式是启动参数:
 
 ```
---trusted-host HOST_IP
+--trusted-host <HOST_IP>
 ```
 
 加上后 `/api/*` 带 cookie 返回 `200`。
@@ -195,28 +191,28 @@ cp -n dsh-client-ui-settings-general/lib/client.js dsh-client-ui-settings-genera
 接本地模型时,`llm/discoverModels` 报:
 
 ```
-http://MODEL_SERVER_IP:8080/v1/models answered 503
+http://<MODEL_SERVER_IP>:8080/v1/models answered 503
 ```
 
 但**在服务器上直接 curl 该地址却是 `200`**:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" --noproxy '*' http://MODEL_SERVER_IP:8080/v1/models
+curl -s -o /dev/null -w "%{http_code}\n" --noproxy '*' http://<MODEL_SERVER_IP>:8080/v1/models
 # 200
 ```
 
 根因:服务以 `HTTP_PROXY/HTTPS_PROXY` 出网,`NO_PROXY` 最初写成网段 CIDR:
 
 ```
-NO_PROXY=localhost,127.0.0.1,LAN_CIDR
+NO_PROXY=localhost,127.0.0.1,<LAN_CIDR>
 ```
 
-**Node 的 `undici` `EnvHttpProxyAgent` 不识别 CIDR 语法**(它只做主机名后缀/精确匹配),于是 `MODEL_SERVER_IP` 没有被排除,请求被送进代理,同网段的私网地址在代理侧不可达 → `503`。
+**Node 的 `undici` `EnvHttpProxyAgent` 不识别 CIDR 语法**(它只做主机名后缀/精确匹配),于是 `<MODEL_SERVER_IP>` 没有被排除,请求被送进代理,同网段的私网地址在代理侧不可达 → `503`。
 
 修复:把 `NO_PROXY` 改成**显式 IP**:
 
 ```
-NO_PROXY=localhost,127.0.0.1,HOST_IP,MODEL_SERVER_IP
+NO_PROXY=localhost,127.0.0.1,<HOST_IP>,<MODEL_SERVER_IP>
 ```
 
 改完 `discoverModels` 立即返回:
@@ -231,7 +227,7 @@ NO_PROXY=localhost,127.0.0.1,HOST_IP,MODEL_SERVER_IP
 
 ## 7. 服务化与防火墙
 
-`/REDACTED/dsh-web.service`:
+`<SYSTEMD_UNIT_PATH>`:
 
 ```ini
 [Unit]
@@ -241,16 +237,16 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-Environment=PATH=/REDACTED/NODE_PREFIX/bin:/usr/local/bin:/usr/bin:/bin
-Environment=DSH_HOME=/REDACTED/DSH_HOME
+Environment=PATH=<NODE_PREFIX>/bin:/usr/local/bin:/usr/bin:/bin
+Environment=DSH_HOME=<DSH_HOME>
 # 出网代理(仅在需要代理出网时设置;本文不展开具体方案)
 Environment=HTTP_PROXY=http://127.0.0.1:PROXY_PORT
 Environment=HTTPS_PROXY=http://127.0.0.1:PROXY_PORT
 # 关键:必须用显式 IP,不能用 CIDR
-Environment=NO_PROXY=localhost,127.0.0.1,HOST_IP,MODEL_SERVER_IP
+Environment=NO_PROXY=localhost,127.0.0.1,<HOST_IP>,<MODEL_SERVER_IP>
 # 本地模型凭据(见 §8.4)
-Environment=LOCAL_QWEN_KEY=REDACTED_MODEL_API_KEY
-ExecStart=/REDACTED/NODE_PREFIX/bin/dsh web --host HOST_IP --port 80 --no-open --trusted-host HOST_IP
+Environment=LOCAL_QWEN_KEY=<REDACTED_MODEL_API_KEY>
+ExecStart=<NODE_PREFIX>/bin/dsh web --host <HOST_IP> --port 80 --no-open --trusted-host <HOST_IP>
 Restart=always
 RestartSec=3
 
@@ -262,10 +258,10 @@ WantedBy=multi-user.target
 
 | 参数 | 作用 |
 |---|---|
-| `--host HOST_IP` | 绑定 LAN IP(依赖补丁 1) |
+| `--host <HOST_IP>` | 绑定 LAN IP(依赖补丁 1) |
 | `--port 80` | HTTP 端口 |
 | `--no-open` | 服务器上不尝试拉起浏览器 |
-| `--trusted-host HOST_IP` | 放行该来源的 `/api/*`(修复 403) |
+| `--trusted-host <HOST_IP>` | 放行该来源的 `/api/*`(修复 403) |
 
 启用:
 
@@ -299,13 +295,13 @@ firewall-cmd --reload
 
 | 项 | 值 |
 |---|---|
-| 服务 | http://MODEL_SERVER_IP:8080/v1(llama.cpp) |
+| 服务 | http://<MODEL_SERVER_IP>:8080/v1(llama.cpp) |
 | 协议 | OpenAI 兼容 chat completions |
 | 模型 id | `qwen-local` |
 | 上下文 | 262144 |
 | 量化 | Q5_K_M(约 20GB) |
-| 鉴权 | `REDACTED_MODEL_API_KEY`(服务端不校验) |
-| GGUF | `/REDACTED/MODEL_FILE` |
+| 鉴权 | `<REDACTED_MODEL_API_KEY>`(服务端不校验) |
+| GGUF | `<MODEL_FILE_PATH>` |
 
 用 `curl` 直接验证过:非流式返回 `200`,流式 SSE 正常(该模型会先输出 `reasoning_content` 增量)。
 
@@ -321,7 +317,7 @@ dsh --profile web --dump-config | grep -A2 -i "pi-ai"
 
 ### 8.3 通过 profile 补丁层声明路由
 
-**不改 `cordis.yml`,而是改补丁层** `/REDACTED/DSH_HOME/profiles/web/cordis.patch.yml`(它在所有 bundle 层之后应用):
+**补丁层文件为** `<DSH_HOME>/profiles/web/cordis.patch.yml`(它在所有 bundle 层之后应用):
 
 ```yaml
 - id: ui-settings-general
@@ -335,7 +331,7 @@ dsh --profile web --dump-config | grep -A2 -i "pi-ai"
       local-qwen:                       # 手写路由名:小写连字符
         displayName: "Qwen Local (llama.cpp)"
         api: openai-completions         # 线协议
-        baseURL: "http://MODEL_SERVER_IP:8080/v1"
+        baseURL: "http://<MODEL_SERVER_IP>:8080/v1"
         apiKeyEnv: LOCAL_QWEN_KEY       # 凭据引用名
         models:                         # 手写路由必须显式给模型列表
           - id: qwen-local
@@ -356,8 +352,8 @@ dsh --profile web --dump-config | grep -A15 "id: llm-pi-ai"
 
 ```bash
 umask 077
-printf 'LOCAL_QWEN_KEY=REDACTED_MODEL_API_KEY\n' > /REDACTED/DSH_HOME/.env
-chmod 600 /REDACTED/DSH_HOME/.env
+printf 'LOCAL_QWEN_KEY=<REDACTED_MODEL_API_KEY>\n' > <DSH_HOME>/.env
+chmod 600 <DSH_HOME>/.env
 # 同时在 dsh-web.service 里设置 Environment=LOCAL_QWEN_KEY=...
 
 systemctl daemon-reload
@@ -368,7 +364,7 @@ systemctl restart dsh-web
 
 ## 9. 端到端验证(含 RPC 调试方法)
 
-页面能开并不等于模型能用,必须真跑一轮。dsh Web 的前后端通过一个桥接端点 `/api/<namespace>/<method>` 通信,调试它本身就是一段「踩坑」,记在这里备查。
+页面能开并不等于模型能用,必须真跑一轮。dsh Web 的前后端通过一个桥接端点 `/api/<namespace>/<method>` 通信,RPC 请求结构如下。
 
 ### 9.1 请求信封
 
@@ -382,7 +378,7 @@ systemctl restart dsh-web
 ```
 
 - 信封字段不对 → 返回 `rpcId: "invalid-request"`;
-- `payload` 不是「恰好一个 plain-object 的 `args` 字段」→ 报
+- `payload` 未满足「恰好一个 plain-object 的 `args` 字段」→ 报
   `Remote payload must contain exactly one plain-object args field`;
 - 字段不符 → 报
   `typert gateway: <method>: args fields do not match the descriptor: missing "x", unexpected "y"`
@@ -391,14 +387,14 @@ systemctl restart dsh-web
 ### 9.2 验证 provider 与目录
 
 ```bash
-curl -s -b cookie.txt -X POST "http://HOST_IP/api/llm/listProviders" \
+curl -s -b cookie.txt -X POST "http://<HOST_IP>/api/llm/listProviders" \
   -H "content-type: application/json" \
   -d '{"type":"client-request","rpcId":"1","method":"llm/listProviders","payload":{"args":{}}}'
 # → deepseek-official, deepseek-account, local-qwen
 ```
 
 ```bash
-curl -s -b cookie.txt -X POST "http://HOST_IP/api/session/modelCatalog" \
+curl -s -b cookie.txt -X POST "http://<HOST_IP>/api/session/modelCatalog" \
   -H "content-type: application/json" \
   -d '{"type":"client-request","rpcId":"2","method":"session/modelCatalog","payload":{"args":{}}}'
 ```
@@ -414,7 +410,7 @@ curl -s -b cookie.txt -X POST "http://HOST_IP/api/session/modelCatalog" \
 
 ### 9.3 坑:会话默认模型是 DeepSeek,不是本地模型
 
-第一次直接 `session/create` 时把模型塞进 `request.model`,接口虽然返回 `ok`,但会话实际仍用默认的 `deepseek-official`(无 key):
+第一次调用 `session/create` 时，即使在 `request.model` 中指定模型且接口返回 `ok`，会话仍使用默认的 `deepseek-official`(无 key):
 
 ```
 sessionStats: { turns:1, steps:1, llmMs:0 }   ← 没真跑
@@ -473,10 +469,10 @@ remote.session.prompt({
 
 | # | 现象 / 报错原文 | 根因 | 定位手段 | 修复 |
 |---|---|---|---|---|
-| 1 | `npm i -g` 引擎报错 | 系统 Node 12.x,`engines` 要求 `^22.19.0\|\|>=24` | 看 `engines.node` | 手动装 Node 22.23.3到 `/REDACTED/NODE_PREFIX` |
-| 2 | `--host HOST_IP` 启动被拒 | host schema 只允许 loopback | 读 `dsh-host-webserver` | 补丁 1:放行 LAN IP |
-| 3 | 无 token `401`;重启后链接失效 | launch token 每次随机 | 看启动日志的 token | 补丁 2:固定 `REDACTED_TOKEN` |
-| 4 | `/api/*` `403` | 非可信来源被拒 | 逐接口尝试 | 启动加 `--trusted-host HOST_IP` |
+| 1 | `npm i -g` 引擎报错 | 系统 Node 12.x,`engines` 要求 `^22.19.0\|\|>=24` | 看 `engines.node` | 手动装 Node 22.23.3到 `<NODE_PREFIX>` |
+| 2 | `--host <HOST_IP>` 启动被拒 | host schema 只允许 loopback | 读 `dsh-host-webserver` | 补丁 1:放行 LAN IP |
+| 3 | 无 token `401`;重启后链接失效 | launch token 每次随机 | 看启动日志的 token | 补丁 2:固定 `<REDACTED_TOKEN>` |
+| 4 | `/api/*` `403` | 非可信来源被拒 | 逐接口尝试 | 启动加 `--trusted-host <HOST_IP>` |
 | 5 | `settings are unavailable in this browser` | 非 loopback 判定关闭设置能力 | 浏览器抓模块 + 源码 | 补丁 3/4/5 |
 | 6 | `discoverModels` 报 `... answered 503`,但直连 `200` | `NO_PROXY` 用了 CIDR,Node `EnvHttpProxyAgent` 不识别 → 私网地址被送进代理 | 服务器直连对比 + 检查服务 env | `NO_PROXY` 改显式 IP |
 | 7 | 会话没跑本地模型(`llmMs:0`、输出空) | `session/create` 里的 model 不生效,默认仍是 deepseek | 读 `session/list` 投影 | 用 `session/selectModel` 切换 |
@@ -492,7 +488,7 @@ remote.session.prompt({
 - **对比连通性**:服务器上 `curl --noproxy '*' <target>` 与经服务内代理的结果对比,能快速区分「网络/代理问题」与「配置问题」
 - **不要** `pkill -f "dsh web"`:会匹配到自身命令行
 - **改 RPC 参考**:客户端 bundle 在
-  `/REDACTED/NODE_GLOBAL_MODULES/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-api-*/lib/client.js`,
+  `<NODE_GLOBAL_MODULES>/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-api-*/lib/client.js`,
   搜 `remote.<ns>.<method>(` 即可看到真实入参结构
 
 ---
@@ -509,11 +505,11 @@ remote.session.prompt({
 
 | 路径 | 说明 |
 |---|---|
-| `/REDACTED/NODE_PREFIX/` | Node 22.23.3 |
-| `/REDACTED/dsh-web.service` | dsh Web 服务(host/port/trusted-host/NO_PROXY/凭据) |
-| `/REDACTED/DSH_HOME/profiles/web/cordis.patch.yml` | profile 补丁(含本地模型路由) |
-| `/REDACTED/DSH_HOME/.credentials.yaml` | 浏览器会话签名密钥(0600) |
-| `/REDACTED/DSH_HOME/.env` | CLI 环境变量(`LOCAL_QWEN_KEY`) |
+| `<NODE_PREFIX>/` | Node 22.23.3 |
+| `<SYSTEMD_UNIT_PATH>` | dsh Web 服务(host/port/trusted-host/NO_PROXY/凭据) |
+| `<DSH_HOME>/profiles/web/cordis.patch.yml` | profile 补丁(含本地模型路由) |
+| `<DSH_HOME>/.credentials.yaml` | 浏览器会话签名密钥(0600) |
+| `<DSH_HOME>/.env` | CLI 环境变量(`LOCAL_QWEN_KEY`) |
 | `…/dsh-host-webserver/lib/index.js:142` | 补丁 1(LAN host) |
 | `…/dsh-client-connection/lib/index.js` | 补丁 2(固定 token) |
 | `…/dsh-client-connection/lib/client.js:1404` | 补丁 3(loopback) |
@@ -524,7 +520,7 @@ remote.session.prompt({
 
 ## 14. 日常使用与后续可选项
 
-- 访问:http://HOST_IP/?token=REDACTED_TOKEN(cookie 约 30 天)
+- 访问:http://<HOST_IP>/?token=<REDACTED_TOKEN>(cookie 约 30 天)
 - 选本地模型:模型选择器 → `Qwen Local (llama.cpp)` → `Qwen3.8-27B Uncensored`
 - 默认模型目前仍是 DeepSeek(需联网且能直连其 API)
 - 可选后续:
