@@ -30,7 +30,7 @@ tags = [
 | 项 | 值 |
 |---|---|
 | 操作系统 | Kylin Linux Advanced Server V10 (Halberd),aarch64 |
-| 硬件 | 鲲鹏 920,64 核,509GB 内存,364GB 磁盘,**无 GPU** |
+| 硬件 | 鲲鹏 920,64 核,509GB 内存,364GB 系统磁盘 + 10T 数据盘（均为 RAID 1）,**无 GPU** |
 | 主机 IP | `<HOST_IP>` |
 | 目标 1 | dsh Web 绑定 LAN IP(`<HOST_IP>`),而非 `127.0.0.1` |
 | 目标 2 | 固定访问令牌 `<REDACTED_TOKEN>`,重启不变 |
