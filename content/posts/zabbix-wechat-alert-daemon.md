@@ -8,7 +8,7 @@ aliases = ["/posts/zabbix-wechat-alert-daemon/"]
 categories = ["笔记"]
 draft = false
 +++
-## 背景
+## 1 背景
 
 生产环境的 Zabbix 服务器处于内网隔离区，无法直接访问互联网，也就无法通过企业微信 API 推送告警。
 
@@ -16,7 +16,7 @@ draft = false
 
 > 说明：本文中的服务器地址、部署路径和运行时信息均已脱敏，示例值需要按实际环境替换。
 
-## 一、服务概述
+## 2 服务概述
 
 | 项目 | 内容 |
 |------|------|
@@ -29,7 +29,7 @@ draft = false
 | **重启策略** | `Restart=always`，失败后 10 秒自动拉起 |
 | **运行状态** | 长期稳定运行 |
 
-### 工作流程
+### 2.1 工作流程
 
 ```text
 ┌─────────────────────┐          ┌──────────────────────┐  企业微信 API   ┌──────────────┐
@@ -39,9 +39,9 @@ draft = false
 └─────────────────────┘          └──────────────────────┘
 ```
 
-## 二、架构与设计
+## 3 架构与设计
 
-### 2.1 核心机制
+### 3.1 核心机制
 
 | 机制 | 说明 |
 |------|------|
@@ -52,13 +52,13 @@ draft = false
 | **异常自检** | 连续 3 次失败触发「自检告警」通知管理员（冷却 5 分钟） |
 | **自动恢复** | systemd `Restart=always`，进程崩溃自动拉起 |
 
-### 2.2 去重策略
+### 3.2 去重策略
 
 基于 `alertid` 的增量进度标记：内存中记录已处理的最大 ID，查询时只取 `alertid > last_processed_id` 的新增数据。发送成功才推进标记，失败则保持不动，下一轮自动重试。
 
-## 三、部署配置
+## 4 部署配置
 
-### 3.1 systemd 服务单元
+### 4.1 systemd 服务单元
 
 **路径**: `/etc/systemd/system/wechat-alert.service`
 
@@ -81,7 +81,7 @@ StandardError=journal
 WantedBy=multi-user.target
 ```
 
-### 3.2 服务管理命令
+### 4.2 服务管理命令
 
 ```bash
 # 查看状态
@@ -100,7 +100,7 @@ systemctl stop wechat-alert.service
 systemctl enable wechat-alert.service
 ```
 
-## 四、脚本代码
+## 5 脚本代码
 
 基于 `alertid` 增量进度标记，不依赖 `status` 字段，适配网闸同步场景。
 
@@ -346,9 +346,9 @@ if __name__ == '__main__':
         time.sleep(CHECK_INTERVAL)
 ```
 
-## 五、运维参考
+## 6 运维参考
 
-### 5.1 文件清单
+### 6.1 文件清单
 
 | 路径 | 说明 |
 |------|------|
@@ -357,7 +357,7 @@ if __name__ == '__main__':
 | `/opt/wechat-alert/venv/` | Python 虚拟环境（含 pymysql） |
 | `/etc/systemd/system/wechat-alert.service` | systemd 服务单元 |
 
-### 5.2 依赖
+### 6.2 依赖
 
 依赖说明：
 
@@ -373,7 +373,7 @@ if __name__ == '__main__':
 pip install pymysql
 ```
 
-### 5.3 企业微信 API
+### 6.3 企业微信 API
 
 | 接口 | 用途 |
 |------|------|

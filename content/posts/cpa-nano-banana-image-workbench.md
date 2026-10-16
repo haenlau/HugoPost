@@ -11,7 +11,7 @@ tags = [
 
 > 一次完整的踩坑记录:CPA 挂着 Codex 免费号,模型列表里明明有 `gpt-image-2`,一调就报 `auth_not_found`。本文讲清楚为什么会这样,以及如何用 Google Cloud 的 $300 试用赠金,把工作台的生图后端切换到 Vertex AI 的 Gemini 图像模型(Nano Banana 系列),最后给出可直接抄的调用文档。
 
-## 背景
+## 1 背景
 
 我这套环境是这样的:
 
@@ -23,7 +23,7 @@ tags = [
 
 目标很简单:让工作台能出图。
 
-## 踩坑:模型列表里有 gpt-image-2,一调就 auth_not_found
+## 2 踩坑:模型列表里有 gpt-image-2,一调就 auth_not_found
 
 调 `/v1/chat/completions` 传 `model=gpt-image-2`,拿到的是:
 
@@ -39,7 +39,7 @@ tags = [
 
 另外一个坑提前说:即使换了 Plus 账号,老版本的 CPA 走图片接口还可能因为本地 `id_token` 时效问题选不上凭证（issue #3508）,表现为文本模型正常、唯独出图报 auth_not_found。所以真要走 codex 出图,先把 CPA 升到最新版。
 
-## 方案选型
+## 3 方案选型
 
 | 路线 | 成本 | 质量 | 结论 |
 |---|---|---|---|
@@ -49,7 +49,7 @@ tags = [
 
 选 $300 的理由:不需要月费、按张计费、能上 `gemini-3-pro-image` 顶配档,个人工作台的量级下 $300 约等于几千张 Pro 图或上万张 flash 图。
 
-## 第一步:验证 key 通道,用"空请求"免费探测模型
+## 4 验证 key 通道,用"空请求"免费探测模型
 
 从 Model Garden / Cloud Console 拿到的**新版 Google API key 是 `AQ.` 开头的**,它是 **Vertex AI 通道**的凭证。验证时要注意:
 
@@ -84,7 +84,7 @@ curl -s https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5
 
 顺带提醒:**Imagen 已经在 2026-08-17 停服**,模型列表里看到 `imagen-*` 不要再配了。
 
-## 第二步:接入 CPA
+## 5 接入 CPA
 
 1. 备份配置:
 
@@ -110,9 +110,9 @@ curl -sk https://127.0.0.1:8317/v1/models \
 
 能看到 `gemini-3-pro-image`、`gemini-3.1-flash-image`、`gemini-2.5-flash-image` 即成功。如果没生效,`sudo systemctl restart cliproxyapi` 再查;动手前一定确认有备份。
 
-## 第三步:调用文档(重要,全是实测的坑)
+## 6 调用文档(重要,全是实测的坑)
 
-### ✅ 唯一推荐姿势:chat completions
+### 6.1 ✅ 唯一推荐姿势:chat completions
 
 ```bash
 curl -sk https://你的CPA地址:8317/v1/chat/completions \
@@ -145,7 +145,7 @@ curl -sk https://你的CPA地址:8317/v1/chat/completions \
 
 **图生图/编辑**:把参考图按标准视觉格式塞进 content 数组(文字 + `image_url` 的 data URI)再发一遍即可。
 
-### ❌ `/v1/images/generations` 不可用
+### 6.2 ❌ `/v1/images/generations` 不可用
 
 实测返回:
 
@@ -155,7 +155,7 @@ curl -sk https://你的CPA地址:8317/v1/chat/completions \
 
 CPA 把 images API 留给了 gpt-image/grok 系(而 gpt-image-2 对免费号又是幽灵条目)。**如果你的前端只支持 images API 格式,接不上,必须用支持 chat 格式的画布或自定义渠道。**
 
-### 直连 Vertex(要完整控制参数时)
+### 6.3 直连 Vertex(要完整控制参数时)
 
 ```bash
 curl -s https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-3.1-flash-image:generateContent \
@@ -169,11 +169,11 @@ curl -s https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-3.1
 
 图片在 `candidates[0].content.parts[].inlineData.data`。**控制宽高比(`1:1`/`16:9`/`9:16` 等)和分辨率(`1K`/`2K`/`4K`)走这条最稳**;经 CPA 的 chat 路径这些参数能否透传我未验证,默认出 1K。
 
-### 接入"无限画布"类工作台
+### 6.4 接入"无限画布"类工作台
 
 设置面板填写 CPA 地址加 `/v1` 作为 Base URL、API Key 和模型 `gemini-3.1-flash-image`。接口格式选 **chat/completions**。注意这类应用的配置存在浏览器 localStorage 里,换浏览器要重填。
 
-## 踩坑速查表
+## 7 踩坑速查表
 
 | 报错 | 原因 | 解法 |
 |---|---|---|
@@ -184,14 +184,14 @@ curl -s https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-3.1
 | 图片"返回为空" | 图片在 `message.images`,不在 `content` | 按 data URI 解析 `images[0].image_url.url` |
 | 列表里有模型但调用失败 | 静态注册表 ≠ 账号可用 | 空请求探测 + 看套餐权益 |
 
-## 费用与安全清单
+## 8 费用与安全清单
 
 - **费用**:GCP 试用 $300,90 天有效,按张扣费;本次项目全部测试(探测 + 十来张样图)共花费约 $0.4。
 - **密钥**:key 在聊天记录、截图、博客里出现过一次就该轮换;Cloud Console → APIs & Services → Credentials 删旧建新,CPA 配置改一行,热重载即生效。文章/截图里一律用占位符。
 - **SSH**:云主机安全组限制源地址是好事;给自动化工具用就单独发一把专用公钥,用完可撤。
 - **配置**:改 CPA 配置前先备份;热重载虽好,重启前先 `systemctl is-active` 确认服务状态。
 
-## 总结
+## 9 总结
 
 整个过程的核心认知就三条:
 
@@ -201,7 +201,7 @@ curl -s https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-3.1
 
 愿意付 $20 月费的话,codex + Plus 出图当然更省事;但在"已有 $300 试用赠金"的前提下,Vertex + Nano Banana 是质量上限更高、单价更低的一条路。
 
-## 参考
+## 10 参考
 
 - [CLIProxyAPI #3038 建议移除 codex free 账号的 gpt-image-2 权限](https://github.com/router-for-me/CLIProxyAPI/issues/3038)
 - [CLIProxyAPI #3406 /v1/images/generations 硬编码路由到 codex](https://github.com/router-for-me/CLIProxyAPI/issues/3406)

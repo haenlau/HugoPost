@@ -13,13 +13,13 @@ tags = [
 
 ---
 
-## 🔧 前置准备
+## 1 🔧 前置准备
 
-### 1. 获取API Key
+### 1.1 获取API Key
 - 访问小米 MiMo 开放平台申请 API Key
 - 当前使用的 API 地址: `https://token-plan-cn.xiaomimimo.com/v1`
 
-### 2. 准备参考音频
+### 1.2 准备参考音频
 - 格式：MP3 或 WAV
 - 建议：16kHz 采样率，64kbps 码率（约 80KB）
 - 内容：清晰的说话音频，10-30 秒为宜
@@ -30,13 +30,13 @@ tags = [
 ffmpeg -y -i original.wav -ar 16000 -ac 1 -b:a 64k optimized.mp3
 ```
 
-### 3. 环境依赖
+### 1.3 环境依赖
 - Python 3.x
 - ffmpeg（用于音频格式转换）
 
 ---
 
-## 📝 核心脚本
+## 2 📝 核心脚本
 
 保存为 `mimo_tts.py`:
 
@@ -218,9 +218,9 @@ if __name__ == "__main__":
 
 ---
 
-## 🚀 使用方法
+## 3 🚀 使用方法
 
-### 命令行调用
+### 3.1 命令行调用
 
 ```bash
 # 基本用法
@@ -233,7 +233,7 @@ python3 mimo_tts.py --input text.txt --output output.ogg --model mimo-v2.5-tts-v
 python3 mimo_tts.py --input text.txt --output output.ogg --style "语气轻松自然"
 ```
 
-### 环境变量配置
+### 3.2 环境变量配置
 
 ```bash
 export XIAOMI_API_KEY="your-api-key-here"
@@ -242,23 +242,23 @@ export XIAOMI_BASE_URL="https://token-plan-cn.xiaomimimo.com/v1"
 
 ---
 
-## 📌 关键注意事项
+## 4 📌 关键注意事项
 
-### 1. API 地址
+### 4.1 API 地址
 当前使用：`https://token-plan-cn.xiaomimimo.com/v1`
 如有变动，设置环境变量 `XIAOMI_BASE_URL` 覆盖
 
-### 2. 认证方式
+### 4.2 认证方式
 - 支持两种方式：
   - Header：`api-key: YOUR_KEY`
   - Header：`Authorization: Bearer YOUR_KEY`
 
-### 3. 参考音频要求
+### 4.3 参考音频要求
 - VoiceClone 模式必须提供参考音频
 - 音频会被 base64 编码后上传（每次调用都上传）
 - 文件越大，API 响应越慢
 
-### 4. 音频格式 MIME 类型
+### 4.4 音频格式 MIME 类型
 ```python
 # MP3 文件
 voice_data = f"data:audio/mp3;base64,{ref_b64}"
@@ -267,7 +267,7 @@ voice_data = f"data:audio/mp3;base64,{ref_b64}"
 voice_data = f"data:audio/wav;base64,{ref_b64}"
 ```
 
-### 5. 响应格式
+### 4.5 响应格式
 ```json
 {
   "choices": [{
@@ -280,7 +280,7 @@ voice_data = f"data:audio/wav;base64,{ref_b64}"
 }
 ```
 
-### 6. 输出格式
+### 4.6 输出格式
 - API 返回 WAV 格式
 - 如需 OGG（用于 Telegram 语音），用 ffmpeg 转换：
 ```bash
@@ -289,7 +289,7 @@ ffmpeg -y -i input.wav -c:a libopus -b:a 64k output.ogg
 
 ---
 
-## 🎯 MiMo TTS 三种模型
+## 5 🎯 MiMo TTS 三种模型
 
 | 模型 | 用途 | 特点 |
 |------|------|------|
@@ -299,13 +299,13 @@ ffmpeg -y -i input.wav -c:a libopus -b:a 64k output.ogg
 
 ---
 
-## 📱 平台兼容性
+## 6 📱 平台兼容性
 
-### Telegram
+### 6.1 Telegram
 - **支持语音气泡**：将生成的 OGG 语音直接发送，Telegram 会以语音气泡形式呈现
 - 这是目前体验最完整的平台，适合做 AI 助手的语音回复
 
-### 其他平台
+### 6.2 其他平台
 - **微信**：目前只能以文件/消息形式发送，不支持原生语音气泡播放
 - **钉钉 / 飞书 / 企业微信**：同样不支持原生语音消息，只能作为音频文件转发
 - **通用方案**：所有平台都可通过上传 OGG/WAV 文件实现语音播放，只是不在聊天界面内显示为"语音气泡"
@@ -314,26 +314,26 @@ ffmpeg -y -i input.wav -c:a libopus -b:a 64k output.ogg
 
 ---
 
-## ⚠️ 常见问题
+## 7 ⚠️ 常见问题
 
-### Q：声音每次都不太一样？
+### 7.1 Q：声音每次都不太一样？
 A：VoiceClone 是概率模型，每次生成会有细微差异，但整体音色保持一致。
 
-### Q：API 响应很慢？
+### 7.2 Q：API 响应很慢？
 A：主要瓶颈在网络和参考音频大小。优化参考音频（MP3 16kHz 64kbps）可以显著提速。
 
-### Q：如何改善克隆效果？
+### 7.3 Q：如何改善克隆效果？
 A:
 - 使用高质量参考音频（清晰、无噪音）
 - 参考音频时长 10-30 秒为宜
 - 避免过度压缩
 
-### Q：中文支持如何？
+### 7.4 Q：中文支持如何？
 A：MiMo 支持中文，效果不错。这是选择它的重要原因之一。
 
 ---
 
-## 🔄 备选方案（支持中文）
+## 8 🔄 备选方案（支持中文）
 
 | 方案 | 价格 | 中文效果 | 特点 |
 |------|------|---------|------|

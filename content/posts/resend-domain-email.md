@@ -20,7 +20,7 @@ Resend 主要解决应用或脚本向外发送邮件的问题。它不提供传�
 
 这样不需要自己维护 SMTP、IMAP、反垃圾邮件和邮件投递基础设施。
 
-## 一、准备工作
+## 1 准备工作
 
 需要准备：
 
@@ -39,7 +39,7 @@ Resend 主要解决应用或脚本向外发送邮件的问题。它不提供传�
 
 以上地址均为示例，实际使用时替换为自己的信息。
 
-## 二、在 Resend 添加域名
+## 2 在 Resend 添加域名
 
 登录 Resend，进入域名管理页面，添加自己的域名：
 
@@ -58,7 +58,7 @@ Verified
 
 这表示 Resend 已经获得代表该域名发送邮件的权限。
 
-## 三、创建 Resend API Key
+## 3 创建 Resend API Key
 
 进入 Resend 的 API Key 页面，创建一个新的 API Key。
 
@@ -84,7 +84,7 @@ RESEND_API_KEY=re_xxxxxxxxxxxxxxxxx
 
 文章、代码仓库和日志中只保留占位符。
 
-## 四、使用 curl 测试发送邮件
+## 4 使用 curl 测试发送邮件
 
 域名验证和 API Key 创建完成后，可以先不写程序，直接使用 `curl` 测试 Resend API：
 
@@ -116,7 +116,7 @@ noreply@example.com
 
 具体可用的发件地址，以 Resend 当前域名验证状态和发送策略为准。
 
-## 五、容易踩坑：Shell 多行命令换行
+## 5 容易踩坑：Shell 多行命令换行
 
 如果把 `curl` 写成多行，反斜杠 `\` 必须是这一行的最后一个字符。
 
@@ -144,7 +144,7 @@ Missing API Key
 
 遇到这种错误时，先检查反斜杠后面是否存在空格或其他不可见字符。
 
-## 六、判断发送是否成功
+## 6 判断发送是否成功
 
 如果 API 调用成功，Resend 会返回一个邮件 ID：
 
@@ -167,7 +167,7 @@ Missing API Key
 
 “API 返回邮件 ID”只代表发送请求被接受，不等于邮件已经进入收件箱。
 
-## 七、配置 Cloudflare Email Routing 接收邮件
+## 7 配置 Cloudflare Email Routing 接收邮件
 
 Resend 解决的是发信。如果还希望：
 
@@ -206,7 +206,7 @@ your-email@gmail.com
 
 这样 Gmail 就成为实际的个人收件箱。
 
-## 八、使用 Cloudflare Worker 处理邮件
+## 8 使用 Cloudflare Worker 处理邮件
 
 如果只是简单转发邮件，Cloudflare Email Routing 本身就可以完成。如果希望对邮件进行进一步处理，例如：
 
@@ -238,7 +238,7 @@ Cloudflare Worker
 
 Worker 不是 Resend 发信所必需的组件，只有在需要自定义收信逻辑时才需要加入。
 
-## 九、最终邮件架构
+## 9 最终邮件架构
 
 完成发信和收信配置后，可以得到一套轻量的个人域名邮件链路：
 
@@ -260,7 +260,7 @@ Worker 不是 Resend 发信所必需的组件，只有在需要自定义收信�
 
 各组件职责如下。
 
-### Resend
+### 9.1 Resend
 
 负责发送邮件，通过 API 调用：
 
@@ -268,19 +268,19 @@ Worker 不是 Resend 发信所必需的组件，只有在需要自定义收信�
 POST https://api.resend.com/emails
 ```
 
-### Cloudflare Email Routing
+### 9.2 Cloudflare Email Routing
 
 负责接收发往域名邮箱的邮件，并转发到最终收件地址。
 
-### Cloudflare Worker
+### 9.3 Cloudflare Worker
 
 负责自定义邮件处理，例如过滤、分类、保存和发送通知。
 
-### Gmail
+### 9.4 Gmail
 
 作为最终收件箱。
 
-## 十、是否需要自己写邮件程序
+## 10 是否需要自己写邮件程序
 
 测试阶段不需要写程序：
 
@@ -311,7 +311,7 @@ Resend API
 me@example.com
 ```
 
-## 十一、网站联系表单场景
+## 11 网站联系表单场景
 
 如果给个人网站增加“联系我”功能，可以采用以下结构：
 
@@ -366,9 +366,9 @@ Resend
 
 浏览器只负责提交表单，Worker 负责使用 Secret 调用 Resend。
 
-## 十二、注意事项
+## 12 注意事项
 
-### 1. API Key 不要泄露
+### 12.1 API Key 不要泄露
 
 如果 API Key 意外出现在以下位置：
 
@@ -380,7 +380,7 @@ Resend
 
 应该立即撤销旧 Key，并重新创建新的 API Key。
 
-### 2. 发件地址必须使用已验证域名
+### 12.2 发件地址必须使用已验证域名
 
 例如验证的是：
 
@@ -398,7 +398,7 @@ noreply@example.com
 
 具体规则以 Resend 当前控制台和发送策略为准。
 
-### 3. 收信和发信是两个独立的问题
+### 12.3 收信和发信是两个独立的问题
 
 不要把 Resend 理解成传统邮箱服务。它主要解决：
 
@@ -414,7 +414,7 @@ Cloudflare Email Routing 解决的是：
 
 因此两者可以组合使用：Resend 负责发信，Cloudflare Email Routing 负责收信，Worker 负责需要定制的邮件处理逻辑。
 
-## 十三、最小验证流程
+## 13 最小验证流程
 
 只想把发信流程跑通时，只需要：
 

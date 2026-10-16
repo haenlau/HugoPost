@@ -11,13 +11,13 @@ tags = [
 
 无限画布项目采用纯前端架构，部署到 Cloudflare Workers 后，可以同时提供静态页面和 CORS 代理。本文记录部署结构、上游同步方式，以及接入 Nano Banana 图像模型时遇到的两种调用路径。
 
-## 一、项目背景
+## 1 项目背景
 
 项目基于开源项目 [basketikun/infinite-canvas](https://github.com/basketikun/infinite-canvas) 二次开发。上游项目采用 React 19、Vite 7、Zustand 和 LocalForage，属于纯前端 SPA，没有独立后端服务。API Key 和画布数据都保存在浏览器本地，因此可以使用静态文件托管，再配合一个 CORS 代理完成部署。
 
-## 二、Cloudflare Worker 部署
+## 2 Cloudflare Worker 部署
 
-### 架构
+### 2.1 架构
 
 ```text
 Worker: infinite-canvas
@@ -28,11 +28,11 @@ Worker: infinite-canvas
 
 同一个 Worker 同时承担静态资源托管和代理功能，不需要额外部署服务器。
 
-### 入口地址
+### 2.2 入口地址
 
 - 主入口：[https://canvas.air1.cn](https://canvas.air1.cn)
 
-### 本地目录
+### 2.3 本地目录
 
 ```text
 本地工作区中的 `infinite-canvas/`
@@ -43,7 +43,7 @@ Worker: infinite-canvas
 └── update.sh                 # 同步上游、构建并部署
 ```
 
-### 对上游源码的改动
+### 2.4 对上游源码的改动
 
 目前只保留两处本地修改：
 
@@ -55,7 +55,7 @@ Worker: infinite-canvas
 
    移除右上角 GitHub 图标链接。
 
-### 常用命令
+### 2.5 常用命令
 
 ```bash
 cd "/d/ZCode Workspace/infinite-canvas/web"
@@ -74,7 +74,7 @@ npx wrangler deploy
 bash update.sh
 ```
 
-### 与上游同步
+### 2.6 与上游同步
 
 Git 历史结构是在上游真实提交之上保留两个本地提交，提交信息以 `local:` 开头。同步时只需要重放这几处本地修改：
 
@@ -99,9 +99,9 @@ fetch → 检测新提交 → rebase → build → deploy
 
 项目中的自定义模型调用脚本是动态读取模型名的通用实现。上游新增 Gemini 系列模型后，可以继续挂载同一份脚本。
 
-## 三、应用配置
+## 3 应用配置
 
-### 渠道
+### 3.1 渠道
 
 一个渠道由以下几部分组成：
 
@@ -112,7 +112,7 @@ fetch → 检测新提交 → rebase → build → deploy
 
 API Key 只保存在当前浏览器的 Local Storage 中。换浏览器、清理网站数据或更换设备后，配置不会自动迁移，其他用户打开网站也无法使用当前浏览器里的 Key。
 
-### 本地代理
+### 3.2 本地代理
 
 在应用中填写 Worker 地址，例如：
 
@@ -122,11 +122,11 @@ https://canvas.air1.cn
 
 开启本地代理后，浏览器请求会经 Worker 转发，并由 Worker 补充 CORS 响应头。对于浏览器直连受到 CORS 限制的渠道，应开启这个选项。
 
-### 数据存储
+### 3.3 数据存储
 
 画布和生成图片保存在浏览器 IndexedDB 中，默认只存在本地，不会跨设备同步。重要画布需要及时导出备份。
 
-## 四、Nano Banana 图像模型接入
+## 4 Nano Banana 图像模型接入
 
 当前使用的模型 ID 包括：
 
@@ -137,7 +137,7 @@ gemini-3-pro-image
 
 前者适合日常生成，后者定位更高，具体价格和可用能力以实际服务商页面为准。
 
-### 调用方式对比
+### 4.1 调用方式对比
 
 | 调用方式 | 状态 | 说明 |
 | --- | --- | --- |
@@ -145,7 +145,7 @@ gemini-3-pro-image
 | `/v1/images/generations` | 不可用 | 当前中转站不通过此路径处理 Gemini 图像模型 |
 | 原生 `:generateContent` + `x-goog-api-key` | 应用原生支持，待配 Key | 完成配置后可通过 Gemini 原生协议解锁 2K / 4K |
 
-### 方案一：通过 Chat Completions 生图
+### 4.2 方案一：通过 Chat Completions 生图
 
 渠道协议选择 OpenAI，接口地址使用实际可用的 OpenAI 兼容中转地址，模型挂载同一份通用脚本。出于安全原因，实际 API Key 不写入文章、仓库或脚本。
 
@@ -210,7 +210,7 @@ return await generateImage({ prompt, images, params, model, http });
 5. 从 `choices[0].message.images[].image_url.url` 提取图片；
 6. 如果接口没有返回图片，优先抛出接口返回的文本错误。
 
-### Chat Completions 路径的限制
+### 4.3 Chat Completions 路径的限制
 
 - 分辨率通常封顶在 1K；
 - `imageSize` 和宽高比参数无法稳定透传；
@@ -219,7 +219,7 @@ return await generateImage({ prompt, images, params, model, http });
 - 生成期间不要关闭页面；
 - 并发请求过多可能触发 `429`，应降低并发后重试。
 
-## 五、Google Vertex AI 与 CPA 反代
+## 5 Google Vertex AI 与 CPA 反代
 
 应用原生调用格式为：
 
@@ -247,11 +247,11 @@ Google Vertex AI 通过 CPA 提供反代服务，画布通过 CPA 反代调用 G
 
 画布中填写 CPA 反代地址，使用 CPA 提供的认证方式，并按反代服务支持的协议配置 Gemini 或 Vertex AI 渠道。真实 Key 不应写入前端源码、Git 仓库、文章或日志。
 
-### 中转站兼容性
+### 5.1 中转站兼容性
 
 画布调用 CPA 反代时，如果原生 `/v1beta/*` 请求被转换为 `Invalid API key`，需要检查 CPA 的路径重写和认证配置，而不是在前端继续修改模型脚本。
 
-## 六、安全注意事项
+## 6 安全注意事项
 
 文档和调试过程中曾使用过多类凭证，包括：
 
@@ -269,7 +269,7 @@ Google Vertex AI 通过 CPA 提供反代服务，画布通过 CPA 反代调用 G
 - 为 Cloudflare Token 设置最小权限和明确的资源范围；
 - 重要画布定期导出备份。
 
-## 七、可选升级
+## 7 可选升级
 
 - [ ] 轮换已经暴露过的凭证；
 - [ ] 走通原生 Gemini 路径，解锁 2K / 4K；

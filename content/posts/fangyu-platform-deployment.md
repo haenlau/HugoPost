@@ -9,7 +9,7 @@ tags = [
 ]
 +++
 
-## 1. 文档目标与边界
+## 1 文档目标与边界
 
 这是一个给值班人员使用的业务辅助平台。它把日常巡检、告警处理、办公网查询、设备操作和企业微信机器人放到同一个入口里，减少重复操作。下面记录它的部署、迁移、恢复和验收方法。
 
@@ -35,7 +35,7 @@ tags = [
 
 本文不保存任何真实密码。所有密码、Token、Bot Secret 都应从内部密码库或原服务器的 root 专用环境文件中取得。
 
-## 2. 现网总体架构
+## 2 现网总体架构
 
 ```mermaid
 flowchart LR
@@ -63,7 +63,7 @@ flowchart LR
 - Zabbix、DHCP、行为管理和防火墙均由平台后端直接调用；
 - 业务端口只监听 `<internal-endpoint>`，避免绕开统一登录。
 
-## 3. 组件与端口
+## 3 组件与端口
 
 | 组件 | systemd 服务 | 监听地址 | 用户入口 | 数据位置 |
 | --- | --- | --- | --- | --- |
@@ -77,7 +77,7 @@ flowchart LR
 
 旧的独立 `8080`、`8090` Web 入口以及旧巡检服务不再是正式架构的一部分。现网的 `zabbix-alert-web.service` 和 `inspection.service` 已停用或禁用。
 
-## 4. 当前菜单与模块顺序
+## 4 当前菜单与模块顺序
 
 平台模块由 `backend/db.py` 的 `module_registry` 统一注册，当前顺序为：
 
@@ -94,7 +94,7 @@ flowchart LR
 
 “用户管理”和“审计日志”仅 `superadmin` 可见。
 
-## 5. 主机基础要求
+## 5 主机基础要求
 
 ### 5.1 推荐规格
 
@@ -120,7 +120,7 @@ apt install -y \
 apt install -y build-essential python3-dev libffi-dev
 ```
 
-## 6. 双网卡和路由
+## 6 双网卡和路由
 
 现网：
 
@@ -186,7 +186,7 @@ ip route get <dhcp-host>
 # 期望：第二网卡路径，src <device-source-ip>
 ```
 
-## 7. DNS 与时间
+## 7 DNS 与时间
 
 IP 主机名查询首先执行 PTR 解析，因此服务器必须使用能够解析办公网 PTR 的 DNS。现网 DNS 为 `<internal-dns>`，同时保留 `<internal-endpoint>` 作为外部备用。
 
@@ -203,7 +203,7 @@ getent hosts <device-gateway>
 
 因此系统保持 UTC 也可以。排查日志时要注意：`journalctl` 的显示时间跟随系统时区，页面审计时间使用北京时间。
 
-## 8. 部署前网络检查
+## 8 部署前网络检查
 
 ```bash
 for target in \
@@ -224,7 +224,7 @@ done
 
 截至 2026-08-12，除 SMB `<smb-server>:445` 外，其余依赖均可达。SMB 不可达不影响本地报告生成和下载。
 
-## 9. 平台发布包构建
+## 9 平台发布包构建
 
 ### 9.1 Windows 构建机依赖
 
@@ -265,7 +265,7 @@ python -m unittest tests.test_firewall_mirror tests.test_platform_api
 
 发布包不会包含密码、运行数据库、报告、临时图片或 `node_modules`。
 
-## 10. 平台与巡检服务安装
+## 10 平台与巡检服务安装
 
 ### 10.1 上传并解压
 
@@ -458,7 +458,7 @@ curl -fsS http://<internal-endpoint>/api/healthz
 
 账号创建完成并修改密码后应删除该文件。已有数据库恢复时通常不会生成该文件。
 
-## 11. 企业微信告警机器人部署
+## 11 企业微信告警机器人部署
 
 机器人程序目前不包含在平台发布包中，必须作为独立组件单独备份和部署。其源目录是：
 
@@ -717,7 +717,7 @@ curl -fsS http://<internal-endpoint>/api/dashboard
 
 当前自动确认规则：北京时间每天 `10:00:00` 启动，在 `10:00:00–10:10:59` 内每 10 秒读取一次待确认告警；只处理 `process_status=0` 且标题包含“测试”的记录；匹配并确认期望的 2 条告警后停止，否则到窗口结束停止。其他告警不会自动确认。
 
-## 12. Nginx 正式入口
+## 12 Nginx 正式入口
 
 ### 12.1 新主机直接启用 80
 
@@ -754,7 +754,7 @@ systemctl reload nginx
 
 正式架构不需要暴露 `18068`、`18080` 或 `18110` 到局域网。
 
-## 13. 各外部系统的接入要求
+## 13 各外部系统的接入要求
 
 ### 13.1 Zabbix 大屏告警清除
 
@@ -913,7 +913,7 @@ systemctl restart fangyu-jingyao-inspection.service
 journalctl -u fangyu-jingyao-inspection.service -n 100 --no-pager
 ```
 
-## 14. 数据目录和数据库
+## 14 数据目录和数据库
 
 ### 14.1 平台数据库
 
@@ -959,7 +959,7 @@ tests/fixtures/report-gold/2026-07-30-morning-gold.pdf
 
 保存机器人状态、自动确认执行结果和最近操作记录，不保存密码。
 
-## 15. 用户与认证
+## 15 用户与认证
 
 - 固定内置账号：`superadmin`；
 - `superadmin` 不能停用或删除；
@@ -973,7 +973,7 @@ tests/fixtures/report-gold/2026-07-30-morning-gold.pdf
 
 若忘记当前 `superadmin` 密码，应通过已登录的超级管理员重置，或执行经过评审的数据库维护流程，不能依赖重新填写 `SUPERADMIN_PASSWORD`。
 
-## 16. 完整迁移备份
+## 16 完整迁移备份
 
 精确迁移至少需要以下内容：
 
@@ -1056,7 +1056,7 @@ find "$backup" -maxdepth 1 -type f ! -name SHA256SUMS \
 
 备份目录含明文环境文件，必须保持 root 专用权限，并进入受控备份系统。上述校验清单只覆盖备份目录第一层的普通文件；`reports/`、`tmp/` 和 `systemd/` 会随整个备份目录一并保存。如需逐文件校验所有子目录，可另行生成递归清单。
 
-## 17. 完整恢复顺序
+## 17 完整恢复顺序
 
 建议顺序：
 
@@ -1116,7 +1116,7 @@ systemctl enable --now \
   fangyu-jingyao-platform.service
 ```
 
-## 18. 日常版本更新
+## 18 日常版本更新
 
 更新前：
 
@@ -1149,7 +1149,7 @@ curl -fsS http://<internal-endpoint>/openapi.json \
 curl -fsS http://<internal-endpoint>/api/healthz
 ```
 
-## 19. 回滚
+## 19 回滚
 
 ### 19.1 仅回滚代码
 
@@ -1174,7 +1174,7 @@ bash /opt/platform/deploy/rollback-root.sh \
   /etc/nginx/sites-enabled/inspection
 ```
 
-## 20. 验收清单
+## 20 验收清单
 
 ### 20.1 基础服务
 
@@ -1222,9 +1222,9 @@ curl -fsS http://<internal-endpoint>/api/healthz
 
 不得为了验收随意使用生产公网地址或内网地址。
 
-## 21. 常见故障
+## 21 常见故障
 
-### 21.1 80 返回 502
+### 21.1 返回 502
 
 ```bash
 systemctl status fangyu-jingyao-platform.service --no-pager
@@ -1296,7 +1296,7 @@ journalctl -u wecom-alarm-test-ack.service \
 
 截至本文基线，`<smb-server>:445` 不可达。平台应继续正常生成本地报告。不要通过修改默认路由破坏其他 25 网段业务来强行测试 SMB。
 
-## 22. 日志位置
+## 22 日志位置
 
 | 内容 | 命令或位置 |
 | --- | --- |
@@ -1310,7 +1310,7 @@ journalctl -u wecom-alarm-test-ack.service \
 
 环境文件中的密码、Token、Secret 不应出现在日志、截图或普通运维文档中。
 
-## 23. 后续模块接入
+## 23 后续模块接入
 
 新增业务模块优先采用：
 
@@ -1330,7 +1330,7 @@ docs/MODULE-INTEGRATION.md
 
 业务数据库默认保持独立。平台只负责统一登录、代理、状态、展示和审计，不要求为了接入而合并数据库。
 
-## 24. 现网 2.8.4 基线
+## 24 现网 2.8.4 基线
 
 截至 2026-08-14：
 
@@ -1352,7 +1352,7 @@ pre-current-release-backup
 pre-previous-release-backup
 ```
 
-## 25. 凭据准备清单
+## 25 凭据准备清单
 
 完整重装前必须准备：
 

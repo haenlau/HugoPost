@@ -8,13 +8,13 @@ aliases = ["/posts/esxi-vm-migration-to-workstation/"]
 categories = ["笔记"]
 draft = false
 +++
-## 背景
+## 1 背景
 
 ESXi 8.0 上跑着一台 Windows 10 虚拟机，装了不少应用。需要把它迁移到本地 Windows 11 主机的 VMware Workstation 里，要求应用和数据完整保留。
 
 目标：在 Workstation 上能直接用，不重装系统、不丢软件。
 
-## 方案选择
+## 2 方案选择
 
 几种主流方案：
 
@@ -26,15 +26,15 @@ ESXi 8.0 上跑着一台 Windows 10 虚拟机，装了不少应用。需要把�
 
 最终选了 Converter。
 
-## 迁移步骤
+## 3 迁移步骤
 
-### 1. 安装 VMware vCenter Converter
+### 3.1 安装 VMware vCenter Converter
 
 下载安装包后运行，安装类型选 **Local installation**。
 
 Client-Server installation 是企业级大规模迁移用的，单台虚拟机迁移不需要。
 
-### 2. 配置 Source
+### 3.2 配置 Source
 
 打开 Converter，点 **Convert machine**：
 
@@ -42,7 +42,7 @@ Client-Server installation 是企业级大规模迁移用的，单台虚拟机�
 - 填入 ESXi 的 IP、用户名、密码
 - 选中要迁移的虚拟机
 
-### 3. 配置 Destination
+### 3.3 配置 Destination
 
 **Destination type 下拉菜单一定选对：**
 
@@ -51,7 +51,7 @@ Client-Server installation 是企业级大规模迁移用的，单台虚拟机�
 
 选对之后不需要填服务器地址，直接指定本地保存路径，比如 `D:\VMs\your-vm-name`。
 
-### 4. 内存设置
+### 3.4 内存设置
 
 进入 Options → Devices → Memory 界面。
 
@@ -61,7 +61,7 @@ Client-Server installation 是企业级大规模迁移用的，单台虚拟机�
 - Win10 + 多应用在 8GB 下够用
 - 后续需要可以在 Workstation 里关机后手动调
 
-### 5. 磁盘类型
+### 3.5 磁盘类型
 
 Options → Data to copy，下拉菜单选磁盘分配类型：
 
@@ -70,7 +70,7 @@ Options → Data to copy，下拉菜单选磁盘分配类型：
 
 选 Pre-allocated 会立刻占满磁盘空间，确保本地磁盘剩余空间足够。
 
-### 6. 高级选项
+### 3.6 高级选项
 
 Options → Advanced options，四个选项全部勾选：
 
@@ -81,13 +81,13 @@ Options → Advanced options，四个选项全部勾选：
 | Remove System Restore checkpoints on destination | 清理还原点，节省空间 |
 | Reconfigure destination virtual machine | 自动将 ESXi 硬件配置转换为 Workstation 兼容配置 |
 
-### 7. 开始转换
+### 3.7 开始转换
 
 确认 Summary 页面信息无误后点 Finish。
 
 转换时间取决于磁盘大小和网络速度，300GB 磁盘在千兆网络下大约 25-40 分钟。
 
-## 首次启动
+## 4 首次启动
 
 转换完成后，去保存路径找到 `.vmx` 文件，用 VMware Workstation 打开。
 
@@ -99,7 +99,7 @@ Options → Advanced options，四个选项全部勾选：
 - 网络是否通（ESXi 常用 vmxnet3，Workstation 也支持，但遇到问题可以改 e1000e）
 - 应用是否正常运行
 
-## 注意事项
+## 5 注意事项
 
 **转换前删除快照**：在 ESXi 上删除或合并所有快照，带快照迁移容易导致数据不一致。
 
