@@ -374,7 +374,7 @@ dsh --profile web --dump-config | grep -A2 -i "pi-ai"
 
 ### 10.3. 通过 profile 补丁层声明路由
 
-**不改 `cordis.yml`,而是改补丁层** `<DSH_HOME>/profiles/web/cordis.patch.yml`(它在所有 bundle 层之后应用):
+**配置文件**:`<DSH_HOME>/profiles/web/cordis.patch.yml`,该补丁层在所有 bundle 层之后应用。
 
 ```yaml
 - id: ui-settings-general
